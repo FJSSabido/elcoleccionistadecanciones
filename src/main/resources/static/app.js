@@ -16,7 +16,7 @@ document.getElementById('loadMyPlaylistsBtn').addEventListener('click', async ()
     select.style.display = 'none';
     select.innerHTML = '<option value="">Cargando...</option>';
     status.textContent = 'Cargando tus playlists...';
-    status.className = 'status'; // reset clases
+    status.className = 'status';
 
     try {
         const res = await fetch('/api/me/playlists');
@@ -42,7 +42,6 @@ document.getElementById('loadMyPlaylistsBtn').addEventListener('click', async ()
         status.textContent = `✅ ${playlists.length} playlists cargadas`;
         status.classList.add('success');
 
-        // Al seleccionar una playlist → generar cartas
         select.onchange = () => {
             if (select.value) {
                 loadCardsFromPlaylistId(select.value);
@@ -98,7 +97,6 @@ document.getElementById('loadFriendPlaylistsBtn').addEventListener('click', asyn
         status.textContent = `✅ ${playlists.length} playlists públicas encontradas`;
         status.classList.add('success');
 
-        // Al seleccionar una playlist de un amigo → generar cartas (con comprobación de login)
         select.onchange = async () => {
             if (select.value) {
                 let isAuthenticated = false;
@@ -107,13 +105,15 @@ document.getElementById('loadFriendPlaylistsBtn').addEventListener('click', asyn
                     if (checkRes.ok) {
                         isAuthenticated = true;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    // Si falla, probablemente no autenticado
+                }
 
                 if (!isAuthenticated) {
                     if (confirm('Para generar cartas de playlists de otros usuarios (incluidas las oficiales de Spotify), debes conectar con tu cuenta Spotify.\n¿Quieres conectar ahora?')) {
                         window.location.href = '/spotify/login';
                     }
-                    select.value = '';
+                    select.value = ''; // deselecciona
                     return;
                 }
 
@@ -122,34 +122,35 @@ document.getElementById('loadFriendPlaylistsBtn').addEventListener('click', asyn
         };
 
     } catch (e) {
-        status.textContent = '❌ Error de conexión o username inválido (prueba todo en minúsculas)';
+        if (res && res.status === 404) {
+            status.textContent = '❌ Usuario no encontrado o sin playlists públicas';
+        } else {
+            status.textContent = '❌ Error de conexión o username inválido (prueba todo en minúsculas)';
+        }
         status.classList.add('error');
         console.error(e);
         select.style.display = 'none';
     }
 });
 
-// === FUNCIÓN PARA CARGAR CARTAS DESDE URL ===
+// === FUNCIONES PARA CARGAR CARTAS ===
 async function loadCardsFromUrl(url) {
     await generateCards('/api/cards?url=' + encodeURIComponent(url));
 }
 
-// === FUNCIÓN PARA CARGAR CARTAS DESDE ID DE PLAYLIST ===
 async function loadCardsFromPlaylistId(playlistId) {
     await generateCards('/api/cards?url=https://open.spotify.com/playlist/' + playlistId);
 }
 
-// === FUNCIÓN COMÚN PARA GENERAR Y MOSTRAR CARTAS ===
 async function generateCards(apiUrl) {
     const cardsContainer = document.getElementById('cards');
-    cardsContainer.innerHTML = '<p>Cargando cartas...</p>';
+    cardsContainer.innerHTML = '<p style="text-align:center; font-size:1.2rem; color:#666;">Cargando cartas...</p>';
 
-    let res;
     try {
-        res = await fetch(apiUrl);
+        const res = await fetch(apiUrl);
         if (!res.ok) {
             if (res.status === 401) {
-                cardsContainer.innerHTML = '<p style="color: #ff4d4d;">❌ Debes conectar con Spotify para acceder a playlists privadas.</p>';
+                cardsContainer.innerHTML = '<p style="color:#e74c3c; text-align:center;">❌ Debes conectar con Spotify para acceder a playlists privadas.</p>';
                 return;
             }
             throw new Error('Error en la respuesta');
@@ -158,7 +159,7 @@ async function generateCards(apiUrl) {
         const cards = await res.json();
 
         if (cards.length === 0) {
-            cardsContainer.innerHTML = '<p>No se encontraron canciones.</p>';
+            cardsContainer.innerHTML = '<p style="text-align:center;">No se encontraron canciones.</p>';
             return;
         }
 
@@ -195,7 +196,7 @@ async function generateCards(apiUrl) {
         });
 
     } catch (e) {
-        cardsContainer.innerHTML = '<p style="color: #ff4d4d;">❌ Error al generar las cartas. Inténtalo de nuevo.</p>';
+        cardsContainer.innerHTML = '<p style="color: #1DB954; text-align: center;">❌ Error de conexión o username inválido (prueba todo en minúsculas)</p>';
         console.error(e);
     }
 }

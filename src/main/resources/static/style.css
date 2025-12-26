@@ -1,83 +1,78 @@
-/* Reset básico */
+/* Layout general - Fondo gris claro */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 body {
-    background-color: #121212; /* Fondo oscuro como Spotify */
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background-color: #f0f0f0;
+    color: #333;
     min-height: 100vh;
-    padding: 20px;
+    padding: 20px 10px;
 }
 
 .container {
-    max-width: 800px;
-    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 30px;
 }
 
 header {
     text-align: center;
-    margin-bottom: 20px;
 }
 
 h1 {
-    font-size: 2rem;
-    color: #1DB954; /* Verde Spotify */
+    font-size: 2.5rem;
+    color: #1DB954;
+    margin-bottom: 5px;
+}
+
+h1 + p {
+    font-size: 1.2rem;
+    color: #555;
 }
 
 h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #fff;
+    font-size: 1.6rem;
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
 }
 
 .btn {
     background-color: #1DB954;
-    color: #fff;
+    color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: 30px;
-    cursor: pointer;
+    border-radius: 50px;
     font-size: 1rem;
-    transition: background-color 0.3s, transform 0.2s;
-    display: flex;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(29, 185, 84, 0.2);
 }
 
 .btn:hover {
     background-color: #1ed760;
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29, 185, 84, 0.3);
 }
 
-.primary {
-    background-color: #1DB954;
-}
-
-.text-input,
-.select-input {
+.text-input, .select-input {
     width: 100%;
     padding: 12px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    background-color: #282828;
-    color: #fff;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333;
     font-size: 1rem;
-    margin-bottom: 10px;
-}
-
-.select-input {
-    height: auto;
 }
 
 .input-group {
@@ -85,47 +80,180 @@ h2 {
     flex-direction: column;
     gap: 10px;
     width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .status {
+    text-align: center;
     margin-top: 10px;
-    font-size: 0.9rem;
+    font-weight: bold;
 }
 
-.status.success {
-    color: #1DB954;
-}
+.status.success { color: #1DB954; }
+.status.error { color: #e74c3c; }
 
-.status.error {
-    color: #ff4d4d;
-}
-
-/* Estilos de cartas (mantengo los tuyos intactos) */
-.card {
-    width: 63mm;
-    height: 88mm;
-    perspective: 1000px;
-}
-
-.cards-container {
+/* Grid de cartas - muchas por fila */
+#cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 20px;
     width: 100%;
-    margin-top: 20px;
-    padding: 0 20px;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 15px;
     justify-items: center;
 }
 
-/* ... (el resto de tus estilos para .card-inner, .card-front, etc., van aquí sin cambios) */
+/* Cartas: fondo negro, cover grande, texto estilizado */
+.card {
+    width: 63mm;
+    height: 88mm;
+    perspective: 1500px;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s ease-in-out;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #fff;
+    border-radius: 8mm;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Anverso: cover grande */
+.card-front {
+    padding: 3px;
+}
+
+.cover-wrapper {
+    height: 62mm; /* Cover grande */
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4mm;
+}
+
+/* Texto: grande y estilizado */
+.info {
+    flex: 1;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.title {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 3px;
+    line-height: 1.1;
+}
+
+.artist {
+    font-size: 9pt;
+    color: #1DB954;
+    font-weight: 600;
+    margin: 2px 0;
+}
+
+.album {
+    font-size: 8pt;
+    opacity: 0.9;
+    margin: 2px 0;
+}
+
+.year {
+    font-size: 8pt;
+    color: #b3b3b3;
+    margin: 2px 0;
+}
+
+.duration {
+    font-size: 8pt;
+    opacity: 0.8;
+    margin-top: auto;
+}
+
+/* Reverso: QR grande centrado */
+.card-back {
+    transform: rotateY(180deg);
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.qr {
+    width: 34mm;
+    height: 34mm;
+    background: white;
+    padding: 4mm;
+    border-radius: 4mm;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.qr img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.scan {
+    margin-top: 10px;
+    font-size: 9pt;
+    opacity: 0.9;
+}
+
+/* Enlace */
+a.card-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-inner {
+    pointer-events: none;
+}
+
+.card-front, .card-back {
+    pointer-events: auto;
+}
 
 /* Footer */
 footer {
-    margin-top: auto;
-    padding: 20px;
     text-align: center;
-    font-size: 0.8rem;
-    color: #b3b3b3;
+    padding: 25px;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: auto;
 }
 
 footer a {
@@ -137,21 +265,13 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Responsive para móviles */
-@media (max-width: 600px) {
-    .container {
-        padding: 10px;
+/* Responsive */
+@media (max-width: 768px) {
+    #cards {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
     }
 
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    h2 {
-        font-size: 1.2rem;
-    }
-
-    .btn {
-        width: 100%;
-    }
+    h1 { font-size: 2rem; }
+    .btn { padding: 12px 20px; }
 }
