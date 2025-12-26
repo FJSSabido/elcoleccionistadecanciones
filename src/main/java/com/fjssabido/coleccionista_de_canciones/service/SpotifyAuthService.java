@@ -22,7 +22,8 @@ public class SpotifyAuthService {
     @Value("${spotify.client-secret}")
     private String clientSecret;
 
-    private final String redirectUri = "http://127.0.0.1:8080/spotify/callback";
+    @Value("${spotify.redirect-uri}")
+    private String redirectUri;
 
     private String userAccessToken;
 
