@@ -1,0 +1,45 @@
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# Maven Wrapper (opcional: mucha gente lo sube, pero se puede regenerar)
+mvnw
+mvnw.cmd
+.mvn/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Application properties con datos sensibles (si los tienes)
+src/main/resources/application-prod.yml
+src/main/resources/application-secret.yml
+# O si usas application.properties con credenciales:
+# src/main/resources/application.properties
+
+# Credenciales locales de Spotify
+application-local.properties

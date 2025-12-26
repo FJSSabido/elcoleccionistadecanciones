@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartas Spotify</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Coleccionista de Canciones Spotify</h2>
+
+<div style="margin-bottom: 20px;">
+    <a href="/spotify/login">
+        <button>Conectar con Spotify (necesario para playlists privadas)</button>
+    </a>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <h3>Mis Playlists</h3>
+    <button id="loadMyPlaylistsBtn">Cargar mis playlists</button>
+    <select id="playlistSelect" size="10" style="width: 500px; margin-top: 10px; display: none;">
+        <option value="">-- Selecciona una playlist --</option>
+    </select>
+    <p id="playlistStatus" style="margin-top: 10px; color: #1DB954;"></p>
+</div>
+
+<div style="margin-bottom: 30px; margin-top: 30px;">
+    <h3>Playlists de un amigo</h3>
+    <input
+            id="friendUsername"
+            type="text"
+            placeholder="Nombre de usuario Spotify (ej: NegativoCeroPositivo)"
+            style="width: 400px; padding: 8px;"
+    />
+    <button id="loadFriendPlaylistsBtn">Cargar playlists públicas</button>
+
+    <select id="friendPlaylistSelect" size="10" style="width: 500px; margin-top: 10px; display: none;">
+        <option value="">-- Selecciona una playlist --</option>
+    </select>
+    <p id="friendStatus" style="margin-top: 10px; color: #1DB954;"></p>
+</div>
+
+<h3>O pegar enlace manual</h3>
+<input
+        id="spotifyUrl"
+        type="text"
+        placeholder="Pega un enlace de Spotify (playlist)"
+        style="width: 500px;"
+/>
+<button id="loadBtn">Generar cartas desde enlace</button>
+
+<div id="cards"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

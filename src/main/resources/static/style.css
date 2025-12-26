@@ -1,0 +1,184 @@
+/* CONTENEDOR CARTA */
+.card {
+  width: 63mm;
+  height: 88mm;
+  perspective: 1000px;
+}
+
+#cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+
+  width: 100%;
+  margin-top: 20px;
+  padding: 0 20px;
+
+  justify-items: center;
+}
+
+
+/* INTERIOR (GIRA) */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+/* EFECTO GIRO */
+.card:hover .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* CARAS */
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  border-radius: 8mm;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  backface-visibility: hidden;
+}
+
+/* ANVERSO */
+.card-front {
+  display: flex;
+  flex-direction: column;
+  padding-top: 6px;   /* 🔑 margen superior interno */
+}
+
+
+.cover {
+  width: 100%;
+  height: 46mm;
+  object-fit: contain;
+  background: #000;
+  border-radius: 4mm;        /* opcional pero elegante */
+}
+
+
+.cover-wrapper {
+  padding: 6px;              /* 🔑 mismo margen en todos los lados */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.info {
+  flex: 1;                      /* ocupa todo el espacio restante */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;      /* 🔑 centrado vertical */
+  align-items: center;          /* centrado horizontal */
+  padding: 5px;
+  text-align: center;
+}
+
+
+
+.title {
+  font-size: 11pt;              /* 🔑 más grande */
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 0 6px 0;            /* separación inferior */
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(255,255,255,0.3);
+  margin: 6px auto 4px auto;
+}
+
+
+
+.artist {
+  font-size: 8.5pt;
+  color: #1DB954;
+  margin: 2px 0;
+}
+
+.album {
+  font-size: 7.5pt;
+  opacity: 0.85;
+  margin: 2px 0;
+}
+
+.duration {
+  font-size: 7.5pt;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* REVERSO */
+.card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr {
+  width: 28mm;
+  height: 28mm;
+  background: #fff;
+  padding: 3mm;
+  border-radius: 3mm;
+}
+
+.scan {
+  margin-top: 6px;
+  font-size: 8pt;
+  opacity: 0.8;
+}
+
+.card {
+  cursor: pointer;
+}
+
+/* Evita que el enlace tenga estilo por defecto */
+a.card {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* El enlace ocupa todo el espacio de la carta */
+a.card-link {
+  display: block;
+  width: 63mm;
+  height: 88mm;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Permitimos que los clics pasen al <a> padre, pero mantenemos el hover */
+.card-inner {
+  pointer-events: none;
+}
+
+/* El contenido de las caras sí recibe eventos (por si en el futuro quieres algo interactivo dentro) */
+.card-front, .card-back {
+  pointer-events: auto;
+}
+
+/* Cursor pointer para indicar que es clicable */
+a.card-link {
+  cursor: pointer;
+}
+
+.year {
+  font-size: 7.5pt;
+  opacity: 0.85;
+  margin: 2px 0;
+  color: #b3b3b3;  /* un gris suave, opcional */
+}
