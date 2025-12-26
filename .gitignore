@@ -43,3 +43,4 @@ src/main/resources/application-secret.yml
 
 # Credenciales locales de Spotify
 application-local.properties
+
