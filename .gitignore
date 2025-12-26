@@ -36,11 +36,8 @@ Thumbs.db
 *.log
 
 # Application properties con datos sensibles (si los tienes)
-src/main/resources/application-prod.yml
-src/main/resources/application-secret.yml
-# O si usas application.properties con credenciales:
-# src/main/resources/application.properties
+src/main/resources/application.properties
 
 # Credenciales locales de Spotify
-application-local.properties
+application.properties
 
