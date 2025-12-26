@@ -2,54 +2,59 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cartas Spotify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coleccionista de Canciones Spotify</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- Íconos opcionales -->
 </head>
 <body>
+<div class="container">
+    <header>
+        <h1><i class="fab fa-spotify"></i> Coleccionista de Canciones Spotify</h1>
+        <p>¡Transforma tus playlists en cartas coleccionables!</p>
+    </header>
 
-<h2>Coleccionista de Canciones Spotify</h2>
+    <section class="connect-section">
+        <a href="/spotify/login" class="btn primary">
+            <i class="fas fa-plug"></i> Conectar con Spotify (necesario para playlists privadas)
+        </a>
+    </section>
 
-<div style="margin-bottom: 20px;">
-    <a href="/spotify/login">
-        <button>Conectar con Spotify (necesario para playlists privadas)</button>
-    </a>
+    <section class="playlist-section">
+        <h2>Mis Playlists</h2>
+        <button id="loadMyPlaylistsBtn" class="btn"><i class="fas fa-sync"></i> Cargar mis playlists</button>
+        <select id="playlistSelect" class="select-input" size="10" style="display: none;">
+            <option value="">-- Selecciona una playlist --</option>
+        </select>
+        <p id="playlistStatus" class="status"></p>
+    </section>
+
+    <section class="playlist-section">
+        <h2>Playlists de un amigo</h2>
+        <div class="input-group">
+            <input id="friendUsername" type="text" class="text-input" placeholder="Nombre de usuario Spotify (ej: NegativoCeroPositivo)">
+            <button id="loadFriendPlaylistsBtn" class="btn"><i class="fas fa-user-friends"></i> Cargar playlists públicas</button>
+        </div>
+        <select id="friendPlaylistSelect" class="select-input" size="10" style="display: none;">
+            <option value="">-- Selecciona una playlist --</option>
+        </select>
+        <p id="friendStatus" class="status"></p>
+    </section>
+
+    <section class="manual-section">
+        <h2>O pegar enlace manual</h2>
+        <div class="input-group">
+            <input id="spotifyUrl" type="text" class="text-input" placeholder="Pega un enlace de Spotify (playlist)">
+            <button id="loadBtn" class="btn"><i class="fas fa-link"></i> Generar cartas desde enlace</button>
+        </div>
+    </section>
+
+    <div id="cards" class="cards-container"></div>
 </div>
 
-<div style="margin-bottom: 20px;">
-    <h3>Mis Playlists</h3>
-    <button id="loadMyPlaylistsBtn">Cargar mis playlists</button>
-    <select id="playlistSelect" size="10" style="width: 500px; margin-top: 10px; display: none;">
-        <option value="">-- Selecciona una playlist --</option>
-    </select>
-    <p id="playlistStatus" style="margin-top: 10px; color: #1DB954;"></p>
-</div>
-
-<div style="margin-bottom: 30px; margin-top: 30px;">
-    <h3>Playlists de un amigo</h3>
-    <input
-            id="friendUsername"
-            type="text"
-            placeholder="Nombre de usuario Spotify (ej: NegativoCeroPositivo)"
-            style="width: 400px; padding: 8px;"
-    />
-    <button id="loadFriendPlaylistsBtn">Cargar playlists públicas</button>
-
-    <select id="friendPlaylistSelect" size="10" style="width: 500px; margin-top: 10px; display: none;">
-        <option value="">-- Selecciona una playlist --</option>
-    </select>
-    <p id="friendStatus" style="margin-top: 10px; color: #1DB954;"></p>
-</div>
-
-<h3>O pegar enlace manual</h3>
-<input
-        id="spotifyUrl"
-        type="text"
-        placeholder="Pega un enlace de Spotify (playlist)"
-        style="width: 500px;"
-/>
-<button id="loadBtn">Generar cartas desde enlace</button>
-
-<div id="cards"></div>
+<footer>
+    <p>Hecho con ❤️ por un fan de la música | <a href="https://github.com/FJSabido/elcoleccionistadecanciones">Ver código en GitHub</a></p>
+</footer>
 
 <script src="app.js"></script>
 </body>
