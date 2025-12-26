@@ -29,7 +29,7 @@ public class SpotifyTrackService {
             headers.setBearerAuth(userToken);
         } else {
             // Si no → usamos token de aplicación (suficiente para playlists públicas)
-            headers.setBearerAuth(appAuthService.getAppAccessToken());
+            headers.setBearerAuth(appAuthService.getUserAccessToken());
         }
 
         return headers;
