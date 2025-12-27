@@ -14,6 +14,7 @@ body {
 }
 
 .container {
+    /* FIX: Restaurado max-width a 1400px para margen lateral y evitar solapamiento con barra */
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
@@ -96,14 +97,14 @@ h2 {
 /* Grid de cartas - muchas por fila */
 #cards {
     display: grid;
-    /* FIX: Ajustado para más ancho: minmax más grande, auto-fill para llenar filas */
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* FIX: minmax a 160px para más cartas por fila sin solaparse */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    /* FIX: gap a 20px para espacio moderado entre cartas */
     gap: 20px;
     width: 100%;
-    /* FIX: Removido max-width para expandir a toda la pantalla */
-    /* max-width: 1400px; */
     margin: 30px auto;
-    padding: 0 15px;
+    /* FIX: padding a 20px para margen lateral */
+    padding: 0 20px;
     justify-items: center;
 }
 
@@ -270,9 +271,9 @@ footer a:hover {
 /* Responsive */
 @media (max-width: 768px) {
     #cards {
-        /* FIX: En móvil, reduce minmax para mejor fit */
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 15px;
+        padding: 0 10px;
     }
 
     h1 { font-size: 2rem; }

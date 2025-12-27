@@ -40,7 +40,7 @@ async function renderCards(url) {
                             <div class="artist">${card.artist}</div>
                             <div class="album">${card.album}</div>
                             <div class="year">${card.year || 'N/A'}</div>
-                            <div class="duration">${card.duration || 'N/A'}</div>
+                            <!-- FIX: Eliminado <div class="duration">${card.duration || 'N/A'}</div> -->
                         </div>
                     </div>
                     <div class="card-back">
