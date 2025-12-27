@@ -11,9 +11,4 @@ public class ColeccionistaDeCancionesApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ColeccionistaDeCancionesApplication.class, args);
 	}
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 }
