@@ -1,15 +1,13 @@
 package com.fjssabido.coleccionista_de_canciones.service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Service
 public class SpotifyAuthService {
@@ -25,30 +23,29 @@ public class SpotifyAuthService {
     @Value("${spotify.redirect-uri}")
     private String redirectUri;
 
-    private String userAccessToken;
+    @Value("${spotify.scopes}")
+    private String scopes;
 
-    // 🔑 ESTE es el token que usa TODA la app
-    public String getUserAccessToken() {
-        return userAccessToken;
-    }
-
+    /**
+     * URL a la que redirigimos al usuario para hacer login en Spotify
+     */
     public String getAuthorizationUrl() {
-        String scopes = String.join(" ",
-                "playlist-read-private",
-                "playlist-read-collaborative"
-        );
-
         return "https://accounts.spotify.com/authorize"
                 + "?response_type=code"
                 + "&client_id=" + clientId
-                + "&scope=" + URLEncoder.encode(scopes, StandardCharsets.UTF_8)
-                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+                + "&scope=" + scopes
+                + "&redirect_uri=" + redirectUri;
     }
 
-    public void exchangeCodeForToken(String code) {
+    /**
+     * Intercambia el 'code' por un access_token
+     * 👉 DEVUELVE el token (antes era void)
+     */
+    public String exchangeCodeForToken(String code) {
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(clientId, clientSecret);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth(clientId, clientSecret);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
@@ -64,6 +61,10 @@ public class SpotifyAuthService {
                 Map.class
         );
 
-        this.userAccessToken = (String) response.getBody().get("access_token");
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("Error al obtener el token de Spotify");
+        }
+
+        return (String) response.getBody().get("access_token");
     }
 }

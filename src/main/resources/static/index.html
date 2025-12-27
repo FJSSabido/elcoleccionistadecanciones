@@ -32,7 +32,8 @@
     <section class="playlist-section">
         <h2>Playlists de un amigo</h2>
         <div class="input-group">
-            <input id="friendUsername" type="text" class="text-input" placeholder="Nombre de usuario Spotify (ej: NegativoCeroPositivo)">
+            <input id="friendUsername" type="text" class="text-input"
+                   placeholder="Pega la URL del perfil de Spotify (https://open.spotify.com/user/...)">
             <button id="loadFriendPlaylistsBtn" class="btn"><i class="fas fa-user-friends"></i> Cargar playlists públicas</button>
         </div>
         <select id="friendPlaylistSelect" class="select-input" size="10" style="display: none;">
@@ -56,6 +57,7 @@
     <p>Hecho con ❤️ por un fan de la música | <a href="https://github.com/FJSabido/elcoleccionistadecanciones">Ver código en GitHub</a></p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

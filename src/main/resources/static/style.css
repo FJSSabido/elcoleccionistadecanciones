@@ -96,10 +96,12 @@ h2 {
 /* Grid de cartas - muchas por fila */
 #cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    /* FIX: Ajustado para más ancho: minmax más grande, auto-fill para llenar filas */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     width: 100%;
-    max-width: 1400px;
+    /* FIX: Removido max-width para expandir a toda la pantalla */
+    /* max-width: 1400px; */
     margin: 30px auto;
     padding: 0 15px;
     justify-items: center;
@@ -268,6 +270,7 @@ footer a:hover {
 /* Responsive */
 @media (max-width: 768px) {
     #cards {
+        /* FIX: En móvil, reduce minmax para mejor fit */
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 15px;
     }

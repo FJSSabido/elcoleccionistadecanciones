@@ -1,202 +1,157 @@
-// === CARGAR CARTAS DESDE ENLACE MANUAL ===
-document.getElementById('loadBtn').addEventListener('click', async () => {
-    const url = document.getElementById('spotifyUrl').value.trim();
-    if (!url) {
-        alert('Pega un enlace de Spotify');
-        return;
-    }
-    await loadCardsFromUrl(url);
-});
+// Función reutilizable para renderizar cartas
+async function renderCards(url) {
+    if (!url) return;
 
-// === CARGAR MIS PLAYLISTS ===
-document.getElementById('loadMyPlaylistsBtn').addEventListener('click', async () => {
-    const select = document.getElementById('playlistSelect');
-    const status = document.getElementById('playlistStatus');
+    console.log("Intentando generar cartas para URL:", url); // Log para debug
 
-    select.style.display = 'none';
-    select.innerHTML = '<option value="">Cargando...</option>';
-    status.textContent = 'Cargando tus playlists...';
-    status.className = 'status';
+    const cardsContainer = document.getElementById("cards");
+    cardsContainer.innerHTML = ""; // Limpiar previas
 
     try {
-        const res = await fetch('/api/me/playlists');
-        if (res.status === 401) {
-            status.textContent = '❌ Debes conectar con Spotify primero';
-            status.classList.add('error');
-            select.style.display = 'none';
-            return;
-        }
-        if (!res.ok) throw new Error('Error del servidor');
-
-        const playlists = await res.json();
-        select.innerHTML = '<option value="">-- Selecciona una playlist --</option>';
-
-        playlists.forEach(pl => {
-            const opt = document.createElement('option');
-            opt.value = pl.id;
-            opt.textContent = `${pl.name} (${pl.trackCount} canciones)`;
-            select.appendChild(opt);
-        });
-
-        select.style.display = 'block';
-        status.textContent = `✅ ${playlists.length} playlists cargadas`;
-        status.classList.add('success');
-
-        select.onchange = () => {
-            if (select.value) {
-                loadCardsFromPlaylistId(select.value);
-            }
-        };
-
-    } catch (e) {
-        status.textContent = '❌ Error al cargar playlists';
-        status.classList.add('error');
-        console.error(e);
-        select.style.display = 'none';
-    }
-});
-
-// === CARGAR PLAYLISTS DE UN AMIGO ===
-document.getElementById('loadFriendPlaylistsBtn').addEventListener('click', async () => {
-    const username = document.getElementById('friendUsername').value.trim();
-    if (!username) {
-        alert('Introduce un nombre de usuario Spotify');
-        return;
-    }
-
-    const select = document.getElementById('friendPlaylistSelect');
-    const status = document.getElementById('friendStatus');
-
-    select.style.display = 'none';
-    select.innerHTML = '<option value="">Cargando...</option>';
-    status.textContent = `Cargando playlists públicas de ${username}...`;
-    status.className = 'status';
-
-    try {
-        const res = await fetch(`/api/users/${encodeURIComponent(username)}/playlists`);
-
-        if (res.status === 404) {
-            status.textContent = '❌ Usuario no encontrado o sin playlists públicas';
-            status.classList.add('error');
-            select.style.display = 'none';
-            return;
-        }
-        if (!res.ok) throw new Error('Error');
-
-        const playlists = await res.json();
-        select.innerHTML = '<option value="">-- Selecciona una playlist --</option>';
-
-        playlists.forEach(pl => {
-            const opt = document.createElement('option');
-            opt.value = pl.id;
-            opt.textContent = `${pl.name} (${pl.trackCount} canciones)`;
-            select.appendChild(opt);
-        });
-
-        select.style.display = 'block';
-        status.textContent = `✅ ${playlists.length} playlists públicas encontradas`;
-        status.classList.add('success');
-
-        select.onchange = async () => {
-            if (select.value) {
-                let isAuthenticated = false;
-                try {
-                    const checkRes = await fetch('/api/me/playlists', { method: 'HEAD' });
-                    if (checkRes.ok) {
-                        isAuthenticated = true;
-                    }
-                } catch (e) {
-                    // Si falla, probablemente no autenticado
-                }
-
-                if (!isAuthenticated) {
-                    if (confirm('Para generar cartas de playlists de otros usuarios (incluidas las oficiales de Spotify), debes conectar con tu cuenta Spotify.\n¿Quieres conectar ahora?')) {
-                        window.location.href = '/spotify/login';
-                    }
-                    select.value = ''; // deselecciona
-                    return;
-                }
-
-                loadCardsFromPlaylistId(select.value);
-            }
-        };
-
-    } catch (e) {
-        if (res && res.status === 404) {
-            status.textContent = '❌ Usuario no encontrado o sin playlists públicas';
-        } else {
-            status.textContent = '❌ Error de conexión o username inválido (prueba todo en minúsculas)';
-        }
-        status.classList.add('error');
-        console.error(e);
-        select.style.display = 'none';
-    }
-});
-
-// === FUNCIONES PARA CARGAR CARTAS ===
-async function loadCardsFromUrl(url) {
-    await generateCards('/api/cards?url=' + encodeURIComponent(url));
-}
-
-async function loadCardsFromPlaylistId(playlistId) {
-    await generateCards('/api/cards?url=https://open.spotify.com/playlist/' + playlistId);
-}
-
-async function generateCards(apiUrl) {
-    const cardsContainer = document.getElementById('cards');
-    cardsContainer.innerHTML = '<p style="text-align:center; font-size:1.2rem; color:#666;">Cargando cartas...</p>';
-
-    try {
-        const res = await fetch(apiUrl);
+        const res = await fetch(`/api/cards?url=${encodeURIComponent(url)}`);
+        console.log("Respuesta fetch:", res.status); // Log status
         if (!res.ok) {
             if (res.status === 401) {
-                cardsContainer.innerHTML = '<p style="color:#e74c3c; text-align:center;">❌ Debes conectar con Spotify para acceder a playlists privadas.</p>';
-                return;
+                cardsContainer.innerHTML = "<p class='status error'>Error: Debes conectarte con Spotify para esta playlist (puede ser privada).</p>";
             }
-            throw new Error('Error en la respuesta');
+            throw new Error("Error fetching cards: " + res.status);
         }
 
         const cards = await res.json();
-
-        if (cards.length === 0) {
-            cardsContainer.innerHTML = '<p style="text-align:center;">No se encontraron canciones.</p>';
-            return;
-        }
-
-        cardsContainer.innerHTML = ''; // Limpiar mensaje de carga
+        console.log("Cartas recibidas:", cards.length); // Log cantidad
 
         cards.forEach(card => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-            cardElement.innerHTML = `
-                <a href="${card.spotifyUrl}" target="_blank" class="card-link">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="cover-wrapper">
-                                <img src="${card.coverUrl}" alt="Portada" class="cover">
-                            </div>
-                            <div class="info">
-                                <div class="title">${card.title}</div>
-                                <div class="artist">${card.artist}</div>
-                                <div class="album">${card.album}</div>
-                                <div class="year">${card.releaseYear}</div>
-                                <div class="duration">${card.duration}</div>
-                            </div>
+            const cardLink = document.createElement("a");
+            cardLink.className = "card-link";
+            cardLink.href = card.spotifyUrl;
+            cardLink.target = "_blank"; // Abre en nueva pestaña
+
+            const cardElem = document.createElement("div");
+            cardElem.className = "card";
+
+            cardElem.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="cover-wrapper">
+                            <img class="cover" src="${card.imageUrl}" alt="${card.title}">
                         </div>
-                        <div class="card-back">
-                            <div class="qr">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(card.spotifyUrl)}" alt="QR">
-                            </div>
-                            <div class="scan">Escanea para escuchar</div>
+                        <div class="info">
+                            <div class="title">${card.title}</div>
+                            <div class="artist">${card.artist}</div>
+                            <div class="album">${card.album}</div>
+                            <div class="year">${card.year || 'N/A'}</div>
+                            <div class="duration">${card.duration || 'N/A'}</div>
                         </div>
                     </div>
-                </a>
+                    <div class="card-back">
+                        <div class="qr"></div>
+                        <div class="scan">Escanea para abrir en Spotify</div>
+                    </div>
+                </div>
             `;
-            cardsContainer.appendChild(cardElement);
-        });
 
+            cardLink.appendChild(cardElem);
+            cardsContainer.appendChild(cardLink);
+
+            // Generar QR en el .qr
+            new QRCode(cardElem.querySelector(".qr"), {
+                text: card.spotifyUrl,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
     } catch (e) {
-        cardsContainer.innerHTML = '<p style="color: #1DB954; text-align: center;">❌ Error de conexión o username inválido (prueba todo en minúsculas)</p>';
-        console.error(e);
+        console.error("Error rendering cards:", e);
+        cardsContainer.innerHTML = "<p class='status error'>Error al generar cartas: " + e.message + "</p>";
     }
 }
+
+// Cargar playlists de amigo
+document.getElementById("loadFriendPlaylistsBtn").addEventListener("click", async () => {
+    const profileUrl = document.getElementById("friendUsername").value.trim();
+    const status = document.getElementById("friendStatus");
+    const select = document.getElementById("friendPlaylistSelect");
+
+    if (!profileUrl) {
+        status.textContent = "Introduce la URL del perfil de Spotify";
+        status.className = "status error";
+        return;
+    }
+
+    status.textContent = "Cargando playlists públicas...";
+    status.className = "status";
+    select.style.display = "none";
+    select.innerHTML = "";
+
+    try {
+        const res = await fetch(`/api/users/playlists?profileUrl=${encodeURIComponent(profileUrl)}`);
+        if (!res.ok) throw new Error();
+
+        const playlists = await res.json();
+
+        playlists.forEach(p => {
+            const option = document.createElement("option");
+            option.value = `https://open.spotify.com/playlist/${p.id}`;
+            option.textContent = `${p.name} (${p.totalTracks} canciones)`;
+            select.appendChild(option);
+        });
+
+        select.style.display = "block";
+        status.textContent = "Playlists públicas cargadas";
+        status.className = "status success";
+    } catch (e) {
+        status.textContent = "No se pudieron cargar playlists públicas";
+        status.className = "status error";
+    }
+});
+
+// Cargar mis playlists
+document.getElementById("loadMyPlaylistsBtn").addEventListener("click", async () => {
+    const status = document.getElementById("playlistStatus");
+    const select = document.getElementById("playlistSelect");
+
+    status.textContent = "Cargando tus playlists...";
+    status.className = "status";
+    select.style.display = "none";
+    select.innerHTML = "";
+
+    try {
+        const res = await fetch(`/api/my/playlists`);
+        if (!res.ok) throw new Error();
+
+        const playlists = await res.json();
+
+        playlists.forEach(p => {
+            const option = document.createElement("option");
+            option.value = `https://open.spotify.com/playlist/${p.id}`;
+            option.textContent = `${p.name} (${p.totalTracks} canciones)`;
+            select.appendChild(option);
+        });
+
+        select.style.display = "block";
+        status.textContent = "Tus playlists cargadas";
+        status.className = "status success";
+    } catch (e) {
+        status.textContent = "No se pudieron cargar tus playlists (¿Conectado a Spotify?)";
+        status.className = "status error";
+    }
+});
+
+// Render al seleccionar playlist (mía)
+document.getElementById("playlistSelect").addEventListener("change", (e) => {
+    renderCards(e.target.value);
+});
+
+// Render al seleccionar playlist (amigo)
+document.getElementById("friendPlaylistSelect").addEventListener("change", (e) => {
+    renderCards(e.target.value);
+});
+
+// Render desde enlace manual
+document.getElementById("loadBtn").addEventListener("click", () => {
+    const url = document.getElementById("spotifyUrl").value.trim();
+    renderCards(url);
+});

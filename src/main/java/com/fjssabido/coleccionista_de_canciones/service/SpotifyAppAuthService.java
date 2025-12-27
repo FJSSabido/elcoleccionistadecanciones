@@ -10,11 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 @Service
 public class SpotifyAppAuthService {
-
-    private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${spotify.client-id}")
     private String clientId;
@@ -22,38 +19,27 @@ public class SpotifyAppAuthService {
     @Value("${spotify.client-secret}")
     private String clientSecret;
 
-    @Value("${spotify.redirect-uri}")  // ← NUEVO: lee de propiedades
-    private String redirectUri;
+    // 🔴 ESTE CAMPO NO EXISTÍA
+    private String appAccessToken;
 
-    private String userAccessToken;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    // 🔑 ESTE es el token que usa TODA la app
-    public String getUserAccessToken() {
-        return userAccessToken;
+    // ✅ TOKEN QUE USA TODA LA APP PARA DATOS PÚBLICOS
+    public String getAppAccessToken() {
+        if (appAccessToken == null) {
+            authenticateApp();
+        }
+        return appAccessToken;
     }
 
-    public String getAuthorizationUrl() {
-        String scopes = String.join(" ",
-                "playlist-read-private",
-                "playlist-read-collaborative"
-        );
-
-        return "https://accounts.spotify.com/authorize"
-                + "?response_type=code"
-                + "&client_id=" + clientId
-                + "&scope=" + URLEncoder.encode(scopes, StandardCharsets.UTF_8)
-                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);  // ← Usa el dinámico
-    }
-
-    public void exchangeCodeForToken(String code) {
+    // 🔐 AUTENTICACIÓN APP (Client Credentials Flow)
+    private void authenticateApp() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(clientId, clientSecret);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_code");
-        body.add("code", code);
-        body.add("redirect_uri", redirectUri);  // ← Usa el dinámico
+        body.add("grant_type", "client_credentials");
 
         HttpEntity<MultiValueMap<String, String>> request =
                 new HttpEntity<>(body, headers);
@@ -64,12 +50,12 @@ public class SpotifyAppAuthService {
                 Map.class
         );
 
-        this.userAccessToken = (String) response.getBody().get("access_token");
-    }
+        Map<String, Object> responseBody = response.getBody();
+        if (responseBody == null || !responseBody.containsKey("access_token")) {
+            throw new RuntimeException("No se pudo obtener el App Access Token");
+        }
 
-    public HttpHeaders appAuthHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(userAccessToken);
-        return headers;
+        // ✅ AQUÍ SE GUARDA (ANTES NO EXISTÍA)
+        this.appAccessToken = (String) responseBody.get("access_token");
     }
 }

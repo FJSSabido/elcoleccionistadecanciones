@@ -1,67 +1,103 @@
 package com.fjssabido.coleccionista_de_canciones.dto;
 
+import java.util.List;
+import java.util.Map;
+
 public class TrackCardDto {
 
+    private String id;
     private String title;
     private String artist;
     private String album;
-    private String coverUrl;
-    private String duration;
+    private String imageUrl;
     private String spotifyUrl;
-    private String releaseYear;
+    // FIX: Nuevos campos
+    private String year;
+    private String duration;
 
-    public TrackCardDto(String title, String artist, String album,
-                        String coverUrl, String duration, String spotifyUrl) {
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.coverUrl = coverUrl;
-        this.duration = duration;
-        this.spotifyUrl = spotifyUrl;
+    // =====================
+    // FACTORY METHOD
+    // =====================
+    @SuppressWarnings("unchecked")
+    public static TrackCardDto fromSpotifyTrack(Map<String, Object> track) {
+        TrackCardDto dto = new TrackCardDto();
+
+        dto.id = (String) track.get("id");
+        dto.title = (String) track.get("name");
+
+        // Artist (primer artista)
+        List<Map<String, Object>> artists = (List<Map<String, Object>>) track.get("artists");
+        if (artists != null && !artists.isEmpty()) {
+            dto.artist = (String) artists.get(0).get("name");
+        }
+
+        // Album
+        Map<String, Object> album = (Map<String, Object>) track.get("album");
+        if (album != null) {
+            dto.album = (String) album.get("name");
+
+            List<Map<String, Object>> images = (List<Map<String, Object>>) album.get("images");
+            if (images != null && !images.isEmpty()) {
+                dto.imageUrl = (String) images.get(0).get("url");
+            }
+
+            // FIX: Extraer year de release_date (solo año)
+            String releaseDate = (String) album.get("release_date");
+            if (releaseDate != null) {
+                dto.year = releaseDate.substring(0, 4);
+            }
+        }
+
+        // FIX: Duration en formato MM:SS
+        Integer durationMs = (Integer) track.get("duration_ms");
+        if (durationMs != null) {
+            int minutes = durationMs / 60000;
+            int seconds = (durationMs % 60000) / 1000;
+            dto.duration = String.format("%d:%02d", minutes, seconds);
+        }
+
+        // Spotify URL
+        Map<String, Object> externalUrls = (Map<String, Object>) track.get("external_urls");
+        if (externalUrls != null) {
+            dto.spotifyUrl = (String) externalUrls.get("spotify");
+        }
+
+        return dto;
     }
 
-    public TrackCardDto(String title, String artist, String album,
-                        String coverUrl, String duration, String spotifyUrl, String releaseYear) {
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.coverUrl = coverUrl;
-        this.duration = duration;
-        this.spotifyUrl = spotifyUrl;
-        this.releaseYear = releaseYear;
+    // =====================
+    // GETTERS
+    // =====================
+    public String getId() {
+        return id;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public String getTitle() {
+        return title;
     }
 
-    public void setCoverUrl(String coverUrl) {
-        this.coverUrl = coverUrl;
+    public String getArtist() {
+        return artist;
     }
 
-    public void setAlbum(String album) {
-        this.album = album;
+    public String getAlbum() {
+        return album;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getSpotifyUrl() {
+        return spotifyUrl;
     }
 
-    public String getReleaseYear() {
-        return releaseYear;
+    // FIX: Getters nuevos
+    public String getYear() {
+        return year;
     }
 
-    public void setReleaseYear(String releaseYear) {
-        this.releaseYear = releaseYear;
+    public String getDuration() {
+        return duration;
     }
-    public String getTitle() { return title; }
-    public String getArtist() { return artist; }
-    public String getAlbum() { return album; }
-    public String getCoverUrl() { return coverUrl; }
-    public String getDuration() { return duration; }
-    public String getSpotifyUrl() { return spotifyUrl; }
 }

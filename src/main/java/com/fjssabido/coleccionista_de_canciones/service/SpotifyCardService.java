@@ -2,6 +2,7 @@ package com.fjssabido.coleccionista_de_canciones.service;
 
 import com.fjssabido.coleccionista_de_canciones.dto.TrackCardDto;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
@@ -14,12 +15,15 @@ public class SpotifyCardService {
         this.trackService = trackService;
     }
 
-    public List<TrackCardDto> generateCardsFromUrl(String url) {
+    public List<TrackCardDto> generateCardsFromUrl(String url, HttpHeaders headers) {
+        String id = extractId(url);
         if (url.contains("/playlist/")) {
-            String id = extractId(url);
-            return trackService.getTracksFromPlaylist(id);
+            return trackService.getTracksFromPlaylist(id, headers);
+        } else if (url.contains("/track/")) {
+            // FIX: Soporte para single track
+            TrackCardDto card = trackService.getTrack(id, headers);
+            return List.of(card);
         }
-
         throw new IllegalArgumentException("URL no soportada");
     }
 
