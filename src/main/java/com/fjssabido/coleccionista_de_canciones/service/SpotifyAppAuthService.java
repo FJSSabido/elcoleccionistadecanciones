@@ -1,7 +1,6 @@
 package com.fjssabido.coleccionista_de_canciones.service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,33 +9,53 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
 @Service
 public class SpotifyAppAuthService {
 
-    @Value("${spotify.client-id}")
+    @Value("${spotify.client-id:}")
     private String clientId;
 
-    @Value("${spotify.client-secret}")
+    @Value("${spotify.client-secret:}")
     private String clientSecret;
 
-    // 🔴 ESTE CAMPO NO EXISTÍA
+    @Value("${spotify.token-url:https://accounts.spotify.com/api/token}")
+    private String tokenUrl;
+
+    private final RestTemplate restTemplate;
+
+    // 🔐 Token y expiración
     private String appAccessToken;
+    private Instant tokenExpiresAt;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    public SpotifyAppAuthService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-    // ✅ TOKEN QUE USA TODA LA APP PARA DATOS PÚBLICOS
-    public String getAppAccessToken() {
-        if (appAccessToken == null) {
+    /**
+     * Token de aplicación para acceder a datos públicos de Spotify
+     */
+    public synchronized String getAppAccessToken() {
+        if (appAccessToken == null || tokenExpired()) {
             authenticateApp();
         }
         return appAccessToken;
     }
 
-    // 🔐 AUTENTICACIÓN APP (Client Credentials Flow)
+    /**
+     * Client Credentials Flow (OAuth)
+     */
     private void authenticateApp() {
+
+        if (clientId.isBlank() || clientSecret.isBlank()) {
+            throw new IllegalStateException(
+                    "Spotify client_id o client_secret no están configurados"
+            );
+        }
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(clientId, clientSecret);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth(clientId, clientSecret);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "client_credentials");
@@ -45,17 +64,27 @@ public class SpotifyAppAuthService {
                 new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> response = restTemplate.postForEntity(
-                "https://accounts.spotify.com/api/token",
+                tokenUrl,
                 request,
                 Map.class
         );
 
         Map<String, Object> responseBody = response.getBody();
+
         if (responseBody == null || !responseBody.containsKey("access_token")) {
-            throw new RuntimeException("No se pudo obtener el App Access Token");
+            throw new RuntimeException(
+                    "No se pudo obtener el App Access Token desde Spotify"
+            );
         }
 
-        // ✅ AQUÍ SE GUARDA (ANTES NO EXISTÍA)
         this.appAccessToken = (String) responseBody.get("access_token");
+
+        // Spotify devuelve expires_in en segundos
+        Integer expiresIn = (Integer) responseBody.getOrDefault("expires_in", 3600);
+        this.tokenExpiresAt = Instant.now().plusSeconds(expiresIn - 60); // margen de seguridad
+    }
+
+    private boolean tokenExpired() {
+        return tokenExpiresAt == null || Instant.now().isAfter(tokenExpiresAt);
     }
 }
