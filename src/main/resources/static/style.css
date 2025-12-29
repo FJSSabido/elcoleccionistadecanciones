@@ -279,3 +279,21 @@ footer a:hover {
     h1 { font-size: 2rem; }
     .btn { padding: 12px 20px; }
 }
+
+.playlist-title {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    text-align: center;
+    margin: 0 auto 15px;
+    padding: 10px 0;
+
+    background-color: #f0f0f0; /* mismo fondo que el body */
+    color: #1DB954;
+    font-weight: 700;
+
+    border-bottom: 1px solid #ddd;
+}
+

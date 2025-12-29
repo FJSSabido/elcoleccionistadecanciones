@@ -1,3 +1,13 @@
+
+
+function showPlaylistTitle(title) {
+    const titleElem = document.getElementById("playlistTitle");
+    if (!titleElem || !title) return;
+
+    titleElem.textContent = `🎧 Playlist: ${title}`;
+    titleElem.style.display = "block";
+}
+
 // =======================
 // Renderizar cartas
 // =======================
@@ -134,6 +144,10 @@ async function loadFriendPlaylists(profileUrl, targetPlaylistId = null) {
             select.value = playlistUrl;
 
             if (select.value) {
+                const selectedOption = select.selectedOptions[0];
+                if (selectedOption) {
+                    showPlaylistTitle(selectedOption.textContent);
+                }
                 renderCards(playlistUrl);
             } else {
                 status.textContent = "La playlist no se encontró";
@@ -210,8 +224,11 @@ const friendPlaylistSelect = document.getElementById("friendPlaylistSelect");
 if (friendPlaylistSelect) {
     friendPlaylistSelect.addEventListener("change", e => {
         const playlistUrl = e.target.value;
+        const selectedOption = e.target.selectedOptions[0];
+        if (selectedOption) {
+            showPlaylistTitle(selectedOption.textContent);
+        }
         renderCards(playlistUrl);
-
         const input = document.getElementById("friendUsername");
         if (!input) return;
 
