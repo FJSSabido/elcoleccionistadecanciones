@@ -110,13 +110,21 @@ function scrollToCards() {
 
 
 /*MOSTRAR EL TITULO DE LA PLAYLIST*/
-function showPlaylistTitle(title) {
+function showPlaylistTitle(title, totalTracks = null, isTrack = false) {
     const titleElem = document.getElementById("playlistTitle");
     if (!titleElem || !title) return;
 
-    titleElem.textContent = `🎧 Playlist: ${title}`;
+    let prefix = isTrack ? "🎵 Canción" : "🎧 Playlist";
+    let suffix = "";
+
+    if (typeof totalTracks === "number") {
+        suffix = ` (${totalTracks} ${totalTracks === 1 ? "canción" : "canciones"})`;
+    }
+
+    titleElem.textContent = `${prefix}: ${title}${suffix}`;
     titleElem.style.display = "block";
 }
+
 // =======================
 // Renderizar cartas
 // =======================
@@ -152,8 +160,10 @@ async function renderCards(url) {
         // 👇 TÍTULO REAL DE PLAYLIST O CANCIÓN (Spotify oficial)
         const spotifyTitle = await fetchSpotifyTitle(url);
         if (spotifyTitle) {
-            showPlaylistTitle(spotifyTitle);
+            const isTrack = cards.length === 1;
+            showPlaylistTitle(spotifyTitle, cards.length, isTrack);
         }
+
 
         allCards = cards;
         currentPage = 1;
