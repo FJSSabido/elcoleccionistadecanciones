@@ -1,4 +1,20 @@
 
+/*PINTAR EL TÍTULO DE LAS PLAYLISTS*/
+async function fetchSpotifyTitle(spotifyUrl) {
+    try {
+        const res = await fetch(
+            `https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`
+        );
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        return data.title || null;
+    } catch {
+        return null;
+    }
+}
+
+
 /*GESTIÓN DEL POPUP DE CARGA*/
 function showLoadingPopup() {
     const popup = document.getElementById("loadingPopup");
@@ -57,6 +73,12 @@ async function renderCards(url) {
 
         const cards = await res.json();
         console.log("Cartas recibidas:", cards.length);
+
+        // 👇 TÍTULO REAL DE PLAYLIST O CANCIÓN (Spotify oficial)
+        const spotifyTitle = await fetchSpotifyTitle(url);
+        if (spotifyTitle) {
+            showPlaylistTitle(spotifyTitle);
+        }
 
         cards.forEach(card => {
             const cardLink = document.createElement("a");
