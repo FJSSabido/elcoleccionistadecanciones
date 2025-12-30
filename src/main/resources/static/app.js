@@ -279,9 +279,25 @@ const loadBtn = document.getElementById("loadBtn");
 if (loadBtn) {
     loadBtn.addEventListener("click", () => {
         const input = document.getElementById("spotifyUrl");
-        if (input) renderCards(input.value.trim());
+        const status = document.getElementById("manualStatus");
+
+        if (!input || !status) return;
+
+        const url = input.value.trim();
+
+        if (!url) {
+            status.textContent = "Introduce un enlace de Spotify (playlist o canción)";
+            status.className = "status error";
+            return;
+        }
+
+        status.textContent = "";
+        status.className = "status";
+
+        renderCards(url);
     });
 }
+
 
 // =======================
 // Init desde URL compartida

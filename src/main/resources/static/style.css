@@ -319,7 +319,7 @@ footer a:hover {
 
 .loading-box {
     background: #fff;
-    padding: 30px 40px;
+    padding: 30px 30px;
     border-radius: 16px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.25);
@@ -327,7 +327,7 @@ footer a:hover {
 }
 
 .loading-box p {
-    margin-top: 15px;
+    margin-top: 5px;
     font-size: 1rem;
     color: #333;
     font-weight: 600;
