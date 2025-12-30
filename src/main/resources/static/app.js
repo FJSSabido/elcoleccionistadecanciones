@@ -1,4 +1,79 @@
 
+/*===================
+    Paginación.
+=====================*/
+const PAGE_SIZE = 100;
+let allCards = [];
+let currentPage = 1;
+
+function renderPage(page) {
+    const cardsContainer = document.getElementById("cards");
+    const pagination = document.getElementById("pagination");
+    const pageInfo = document.getElementById("pageInfo");
+    const prevBtn = document.getElementById("prevPageBtn");
+    const nextBtn = document.getElementById("nextPageBtn");
+
+    if (!cardsContainer || !pagination) return;
+
+    cardsContainer.innerHTML = "";
+
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const pageCards = allCards.slice(start, end);
+
+    pageCards.forEach(card => {
+        const cardLink = document.createElement("a");
+        cardLink.className = "card-link";
+        cardLink.href = card.spotifyUrl;
+        cardLink.target = "_blank";
+
+        const cardElem = document.createElement("div");
+        cardElem.className = "card";
+
+        cardElem.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="cover-wrapper">
+                        <img class="cover" src="${card.imageUrl}" alt="${card.title}">
+                    </div>
+                    <div class="info">
+                        <div class="title">${card.title}</div>
+                        <div class="artist">${card.artist}</div>
+                        <div class="album">${card.album}</div>
+                        <div class="year">${card.year || 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="qr"></div>
+                    <div class="scan">Escanea para abrir en Spotify</div>
+                </div>
+            </div>
+        `;
+
+        cardLink.appendChild(cardElem);
+        cardsContainer.appendChild(cardLink);
+
+        new QRCode(cardElem.querySelector(".qr"), {
+            text: card.spotifyUrl,
+            width: 128,
+            height: 128,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    });
+
+    const totalPages = Math.ceil(allCards.length / PAGE_SIZE);
+
+    pageInfo.textContent = `Página ${page} de ${totalPages}`;
+    prevBtn.disabled = page === 1;
+    nextBtn.disabled = page === totalPages;
+
+    pagination.style.display = totalPages > 1 ? "block" : "none";
+
+    scrollToCards();
+}
+
+
+
 /*PINTAR EL TÍTULO DE LAS PLAYLISTS*/
 async function fetchSpotifyTitle(spotifyUrl) {
     try {
@@ -80,47 +155,9 @@ async function renderCards(url) {
             showPlaylistTitle(spotifyTitle);
         }
 
-        cards.forEach(card => {
-            const cardLink = document.createElement("a");
-            cardLink.className = "card-link";
-            cardLink.href = card.spotifyUrl;
-            cardLink.target = "_blank";
-
-            const cardElem = document.createElement("div");
-            cardElem.className = "card";
-
-            cardElem.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-front">
-                        <div class="cover-wrapper">
-                            <img class="cover" src="${card.imageUrl}" alt="${card.title}">
-                        </div>
-                        <div class="info">
-                            <div class="title">${card.title}</div>
-                            <div class="artist">${card.artist}</div>
-                            <div class="album">${card.album}</div>
-                            <div class="year">${card.year || 'N/A'}</div>
-                        </div>
-                    </div>
-                    <div class="card-back">
-                        <div class="qr"></div>
-                        <div class="scan">Escanea para abrir en Spotify</div>
-                    </div>
-                </div>
-            `;
-
-            cardLink.appendChild(cardElem);
-            cardsContainer.appendChild(cardLink);
-
-            new QRCode(cardElem.querySelector(".qr"), {
-                text: card.spotifyUrl,
-                width: 128,
-                height: 128,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        });
+        allCards = cards;
+        currentPage = 1;
+        renderPage(currentPage);
 
         // 👇 TODO HA TERMINADO
         hideLoadingPopup();
@@ -330,3 +367,35 @@ window.addEventListener("load", () => {
         renderCards(spotifyUrl);
     }
 });
+
+
+/*==================================
+    Necesario para la paginación
+====================================*/
+document.getElementById("prevPageBtn")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+        showLoadingPopup();              // 👈 mostrar popup
+        currentPage--;
+
+        // pequeño delay para que el popup se vea
+        setTimeout(() => {
+            renderPage(currentPage);
+            hideLoadingPopup();          // 👈 ocultar popup
+        }, 150);
+    }
+});
+
+document.getElementById("nextPageBtn")?.addEventListener("click", () => {
+    const totalPages = Math.ceil(allCards.length / PAGE_SIZE);
+    if (currentPage < totalPages) {
+        showLoadingPopup();              // 👈 mostrar popup
+        currentPage++;
+
+        setTimeout(() => {
+            renderPage(currentPage);
+            hideLoadingPopup();          // 👈 ocultar popup
+        }, 150);
+    }
+});
+
+
