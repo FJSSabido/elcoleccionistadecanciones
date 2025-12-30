@@ -348,3 +348,17 @@ footer a:hover {
     to { transform: rotate(360deg); }
 }
 
+/* Centrar carta cuando solo hay una */
+#cards.single-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+/* Centrar carta cuando solo hay una */
+#cards.single-card a.card-link {
+    grid-column: 1 / -1;      /* ocupa todo el grid */
+    justify-self: center;     /* centra el link */
+    width: auto;              /* deja que ajuste al contenido */
+}
+
+

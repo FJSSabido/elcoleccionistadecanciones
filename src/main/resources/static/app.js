@@ -21,6 +21,14 @@ function renderPage(page) {
     const end = start + PAGE_SIZE;
     const pageCards = allCards.slice(start, end);
 
+    // 👇 Centrar carta si solo hay una en la página
+    if (pageCards.length === 1) {
+        cardsContainer.classList.add("single-card");
+    } else {
+        cardsContainer.classList.remove("single-card");
+    }
+
+
     pageCards.forEach(card => {
         const cardLink = document.createElement("a");
         cardLink.className = "card-link";
