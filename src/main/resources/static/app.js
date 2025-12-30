@@ -1,5 +1,24 @@
 
+/*GESTIÓN DEL POPUP DE CARGA*/
+function showLoadingPopup() {
+    const popup = document.getElementById("loadingPopup");
+    if (popup) popup.style.display = "flex";
+}
 
+function hideLoadingPopup() {
+    const popup = document.getElementById("loadingPopup");
+    if (popup) popup.style.display = "none";
+}
+
+function scrollToCards() {
+    const cards = document.getElementById("cards");
+    if (cards) {
+        cards.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
+
+
+/*MOSTRAR EL TITULO DE LA PLAYLIST*/
 function showPlaylistTitle(title) {
     const titleElem = document.getElementById("playlistTitle");
     if (!titleElem || !title) return;
@@ -7,7 +26,6 @@ function showPlaylistTitle(title) {
     titleElem.textContent = `🎧 Playlist: ${title}`;
     titleElem.style.display = "block";
 }
-
 // =======================
 // Renderizar cartas
 // =======================
@@ -20,6 +38,8 @@ async function renderCards(url) {
     if (!cardsContainer) return;
 
     cardsContainer.innerHTML = "";
+
+    showLoadingPopup(); // 👈 MOSTRAR POPUP AL EMPEZAR
 
     try {
         const res = await fetch(`/api/cards?url=${encodeURIComponent(url)}`);
@@ -77,12 +97,19 @@ async function renderCards(url) {
                 correctLevel: QRCode.CorrectLevel.H
             });
         });
+
+        // 👇 TODO HA TERMINADO
+        hideLoadingPopup();
+        scrollToCards();
+
     } catch (e) {
         console.error("Error rendering cards:", e);
+        hideLoadingPopup();
         cardsContainer.innerHTML =
             "<p class='status error'>Error al generar cartas: " + e.message + "</p>";
     }
 }
+
 
 // =======================
 // URL compartible

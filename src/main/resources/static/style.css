@@ -305,3 +305,46 @@ footer a:hover {
     border-bottom: 1px solid #ddd;
 }
 
+/* Popup de carga */
+.loading-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-box {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    max-width: 300px;
+}
+
+.loading-box p {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Spinner */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #1DB954;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
