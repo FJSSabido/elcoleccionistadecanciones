@@ -361,4 +361,32 @@ footer a:hover {
     width: auto;              /* deja que ajuste al contenido */
 }
 
+.bmc-container {
+    transform: scale(0.5);          /* Tamaño del botón de buy me a coffee*/
+    transform-origin: bottom center;
+}
+
+.bmc-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 5px;
+    transform: scale(0.5);
+    transform-origin: center;
+}
+
+@media (max-width: 768px) {
+    .bmc-container {
+        transform: scale(0.65);
+    }
+}
+
+/*Eso asegura que tó el footer esté perfectamente alineado, incluso si mañana añades más cosas.*/
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
 
