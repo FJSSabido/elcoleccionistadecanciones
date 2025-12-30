@@ -207,6 +207,7 @@ async function renderCards(url) {
         allCards = cards;
         currentPage = 1;
         renderPage(currentPage);
+        mostrarBotonCafe();
 
         // 👇 TODO HA TERMINADO
         hideLoadingPopup();
@@ -224,6 +225,17 @@ async function renderCards(url) {
               manualStatus.className = "status error";
           }
       }
+}
+
+
+/*=========================
+    Mostrar botón café
+===========================*/
+function mostrarBotonCafe() {
+    const bmc = document.querySelector('.bmc-container');
+    if (bmc) {
+        bmc.style.display = 'flex';
+    }
 }
 
 
