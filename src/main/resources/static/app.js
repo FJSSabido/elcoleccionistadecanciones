@@ -125,6 +125,31 @@ function showPlaylistTitle(title, totalTracks = null, isTrack = false) {
     titleElem.style.display = "block";
 }
 
+/*====================================
+    Función para resetear la vista.
+======================================*/
+function resetCardsView() {
+    const titleElem = document.getElementById("playlistTitle");
+    const cardsContainer = document.getElementById("cards");
+    const pagination = document.getElementById("pagination");
+
+    if (titleElem) {
+        titleElem.textContent = "";
+        titleElem.style.display = "none";
+    }
+
+    if (cardsContainer) {
+        cardsContainer.innerHTML = "";
+    }
+
+    if (pagination) {
+        pagination.style.display = "none";
+    }
+
+    allCards = [];
+    currentPage = 1;
+}
+
 // =======================
 // Renderizar cartas
 // =======================
@@ -139,6 +164,12 @@ async function renderCards(url) {
     if (!cardsContainer) return;
 
     cardsContainer.innerHTML = "";
+
+    const manualStatus = document.getElementById("manualStatus");
+    if (manualStatus) {
+        manualStatus.textContent = "";
+        manualStatus.className = "status";
+    }
 
     showLoadingPopup(); // 👈 MOSTRAR POPUP AL EMPEZAR
 
@@ -174,11 +205,17 @@ async function renderCards(url) {
         scrollToCards();
 
     } catch (e) {
-        console.error("Error rendering cards:", e);
-        hideLoadingPopup();
-        cardsContainer.innerHTML =
-            "<p class='status error'>Error al generar cartas: " + e.message + "</p>";
-    }
+          console.error("Error rendering cards:", e);
+          hideLoadingPopup();
+
+          resetCardsView(); // 👈 LIMPIA título, cartas y paginación
+
+          const manualStatus = document.getElementById("manualStatus");
+          if (manualStatus) {
+              manualStatus.textContent = "Error al generar cartas. Revisa el enlace de Spotify.";
+              manualStatus.className = "status error";
+          }
+      }
 }
 
 
