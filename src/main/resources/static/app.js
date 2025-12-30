@@ -32,6 +32,8 @@ function showPlaylistTitle(title) {
 async function renderCards(url) {
     if (!url) return;
 
+    updateUrlWithSpotifyUrl(url); // 👈 URL SIEMPRE ACTUALIZADA
+
     console.log("Intentando generar cartas para URL:", url);
 
     const cardsContainer = document.getElementById("cards");
@@ -128,6 +130,17 @@ function extractUserId(profileUrl) {
     const parts = profileUrl.split('/user/');
     return parts.length > 1 ? parts[1].split('?')[0] : null;
 }
+
+function updateUrlWithSpotifyUrl(spotifyUrl) {
+    const newUrl = `${window.location.origin}${window.location.pathname}?spotifyUrl=${encodeURIComponent(spotifyUrl)}`;
+    history.pushState({ spotifyUrl }, '', newUrl);
+}
+
+function getSpotifyUrlFromLocation() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("spotifyUrl");
+}
+
 
 // =======================
 // Playlists de amigo
@@ -258,13 +271,6 @@ if (friendPlaylistSelect) {
         renderCards(playlistUrl);
         const input = document.getElementById("friendUsername");
         if (!input) return;
-
-        const userId = extractUserId(input.value.trim());
-        const playlistId = extractPlaylistId(playlistUrl);
-
-        if (userId && playlistId) {
-            updateShareableUrl(userId, playlistId);
-        }
     });
 }
 
@@ -281,15 +287,8 @@ if (loadBtn) {
 // Init desde URL compartida
 // =======================
 window.addEventListener("load", () => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("user") && params.has("playlist")) {
-        const userId = params.get("user");
-        const playlistId = params.get("playlist");
-        const profileUrl = `https://open.spotify.com/user/${userId}`;
-
-        const input = document.getElementById("friendUsername");
-        if (input) input.value = profileUrl;
-
-        loadFriendPlaylists(profileUrl, playlistId);
+    const spotifyUrl = getSpotifyUrlFromLocation();
+    if (spotifyUrl) {
+        renderCards(spotifyUrl);
     }
 });
