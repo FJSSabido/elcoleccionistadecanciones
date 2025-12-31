@@ -282,7 +282,7 @@ a.card-link {
     top: 0;
     z-index: 10;
 
-    width: 100vw;                 /* 👈 ocupa todo el ancho de pantalla */
+    width: 100vw;                 /* 👈 ocupa tó el ancho de pantalla */
     margin-left: calc(-50vw + 50%); /* 👈 rompe el max-width del container */
 
     text-align: center;
@@ -347,7 +347,7 @@ a.card-link {
 
 /* Centrar carta cuando solo hay una */
 #cards.single-card a.card-link {
-    grid-column: 1 / -1;      /* ocupa todo el grid */
+    grid-column: 1 / -1;      /* ocupa tó el grid */
     justify-self: center;     /* centra el link */
     width: auto;              /* deja que ajuste al contenido */
 }
@@ -397,13 +397,13 @@ footer {
 
 /* Botón Buy Me a Coffee */
 .bmc-container {
-    position: absolute;
-    top: -30px;               /* 👈 flota sobre el footer */
+    position: fixed;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
 
     display: none;              /* controlado por JS */
-    z-index: 20;
+    z-index: 9999;
 }
 
 .bmc-container iframe {
@@ -521,3 +521,14 @@ footer {
         text-overflow: ellipsis;  /* … si es muy largo */
     }
 }
+
+.cards-container {
+    padding-bottom: 140px; /* espacio para que no se solape el botón */
+}
+
+@media (max-width: 768px) {
+    .cards-container {
+        padding-bottom: 160px;
+    }
+}
+

@@ -225,52 +225,6 @@ async function renderCards(spotifyUrl) {
     }
 }
 
-// =======================
-// Cargar playlists propias → Generar cartas directamente
-// =======================
-const loadMyPlaylistsBtn = document.getElementById("loadMyPlaylistsBtn");
-if (loadMyPlaylistsBtn) {
-    loadMyPlaylistsBtn.addEventListener("click", async () => {
-        const status = document.getElementById("playlistStatus");
-
-        if (!status) return;
-
-        status.textContent = "Cargando tus playlists...";
-        status.className = "status";
-
-        showLoadingPopup();
-
-        try {
-            const res = await fetch(`/api/my/playlists`);
-            if (!res.ok) throw new Error();
-
-            const data = await res.json();
-            const playlists = data.playlists;
-            const displayName = data.displayName || "Tus";
-
-            allCards = playlists.map(p => ({
-                title: p.name,
-                artist: `By ${p.owner}`,
-                album: `${p.totalTracks} tracks`,
-                year: '',
-                imageUrl: p.imageUrl,
-                spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
-            }));
-
-            renderPage(1);
-
-            showPlaylistTitle(`${displayName} playlists`, playlists.length);
-
-            status.textContent = "Tus playlists cargadas como cartas";
-            status.className = "status success";
-        } catch {
-            status.textContent = "No se pudieron cargar tus playlists";
-            status.className = "status error";
-        } finally {
-            hideLoadingPopup();
-        }
-    });
-}
 
 // =======================
 // Cargar playlists de amigo → Generar cartas directamente
@@ -314,6 +268,7 @@ if (loadFriendPlaylistsBtn) {
             }));
 
             renderPage(1);
+            showCoffeeButton();
             showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length);
             updateUrlWithProfile(profileUrl);
 
@@ -349,6 +304,7 @@ if (loadBtn) {
         status.className = "status";
 
         renderCards(url);
+        showCoffeeButton();
         updateUrlWithSpotify(url);
     });
 }
@@ -364,6 +320,7 @@ window.addEventListener("load", () => {
 
     if (spotifyUrl) {
         renderCards(spotifyUrl);
+        showCoffeeButton();
     } else if (profileUrl) {
         document.getElementById("friendUsername").value = profileUrl;
         document.getElementById("loadFriendPlaylistsBtn").click();
@@ -400,3 +357,10 @@ document.getElementById("nextPageBtn")?.addEventListener("click", () => {
         }, 150);
     }
 });
+
+function showCoffeeButton() {
+    const bmc = document.querySelector('.bmc-container');
+    if (bmc) {
+        bmc.style.display = 'block';
+    }
+}
