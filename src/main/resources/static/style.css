@@ -106,6 +106,7 @@ h2 {
     /* FIX: padding a 20px para margen lateral */
     padding: 0 20px;
     justify-items: center;
+    padding-bottom: 60px;
 }
 
 /* Cartas: fondo negro, cover grande, texto estilizado */
@@ -520,15 +521,9 @@ footer {
         overflow: hidden;         /* evita crecer */
         text-overflow: ellipsis;  /* … si es muy largo */
     }
-}
-
-.cards-container {
-    padding-bottom: 140px; /* espacio para que no se solape el botón */
-}
-
-@media (max-width: 768px) {
-    .cards-container {
-        padding-bottom: 160px;
+    #cards {
+        padding-bottom: 120px;
     }
 }
+
 
