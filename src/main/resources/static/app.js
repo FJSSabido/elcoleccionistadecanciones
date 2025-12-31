@@ -53,7 +53,6 @@ function renderPage(page) {
                 </div>
                 <div class="card-back">
                     <div class="qr"></div>
-                    <div class="scan">Escanea para abrir en Spotify</div>
                 </div>
             </div>
         `;
