@@ -1,4 +1,37 @@
-// Modified: app.js
+
+/*======================================
+    Mantener las URL para las playlist.
+========================================*/
+function updateUrlWithProfile(profileUrl) {
+    const params = new URLSearchParams(window.location.search);
+    params.set("profile", profileUrl);
+    params.delete("spotify"); // evita estados mezclados
+
+    const newUrl =
+        window.location.pathname + "?" + params.toString();
+
+    window.history.pushState({}, "", newUrl);
+}
+
+
+/*======================================
+    Mantener las URL para las canciones.
+========================================*/
+function updateUrlWithSpotify(spotifyUrl) {
+    const params = new URLSearchParams(window.location.search);
+
+    if (spotifyUrl) {
+        params.set("spotify", spotifyUrl);
+    } else {
+        params.delete("spotify");
+    }
+
+    const newUrl =
+        window.location.pathname +
+        (params.toString() ? "?" + params.toString() : "");
+
+    window.history.pushState({}, "", newUrl);
+}
 
 /*===================
     Paginación.
@@ -281,8 +314,8 @@ if (loadFriendPlaylistsBtn) {
             }));
 
             renderPage(1);
-
             showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length);
+            updateUrlWithProfile(profileUrl);
 
             status.textContent = "Playlists cargadas como cartas";
             status.className = "status success";
@@ -316,6 +349,7 @@ if (loadBtn) {
         status.className = "status";
 
         renderCards(url);
+        updateUrlWithSpotify(url);
     });
 }
 
@@ -324,11 +358,18 @@ if (loadBtn) {
 // Init desde URL compartida
 // =======================
 window.addEventListener("load", () => {
-    const spotifyUrl = getSpotifyUrlFromLocation();
+    const params = new URLSearchParams(window.location.search);
+    const spotifyUrl = params.get("spotify");
+    const profileUrl = params.get("profile");
+
     if (spotifyUrl) {
         renderCards(spotifyUrl);
+    } else if (profileUrl) {
+        document.getElementById("friendUsername").value = profileUrl;
+        document.getElementById("loadFriendPlaylistsBtn").click();
     }
 });
+
 
 
 /*==================================
