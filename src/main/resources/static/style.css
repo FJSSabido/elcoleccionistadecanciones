@@ -399,12 +399,14 @@ footer {
 /* Botón Buy Me a Coffee */
 .bmc-container {
     position: fixed;
-    bottom: 24px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
 
     display: none;              /* controlado por JS */
     z-index: 9999;
+
+    padding-bottom: env(safe-area-inset-bottom); /* 👈 iOS */
 }
 
 .bmc-container iframe {
@@ -524,6 +526,17 @@ footer {
     #cards {
         padding-bottom: 120px;
     }
+    #pagination {
+        margin-bottom: 140px;  /* si hay paginación */
+    }
 }
+
+/* Fuerza estilo limpio del botón de café */
+.bmc-container a,
+.bmc-container iframe {
+    text-decoration: none !important;
+    text-align: center !important;
+}
+
 
 
