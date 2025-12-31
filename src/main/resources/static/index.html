@@ -1,3 +1,4 @@
+<!-- Modified: index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,30 +15,28 @@
         <p>¡Transforma tus playlists en cartas coleccionables!</p>
     </header>
 
-<!--    <section class="connect-section">-->
-<!--        <a href="/spotify/login" class="btn primary">-->
-<!--            <i class="fas fa-plug"></i> Conectar con Spotify (necesario para playlists privadas)-->
-<!--        </a>-->
-<!--    </section>-->
+    <!--    <section class="connect-section">-->
+    <!--        <a href="/spotify/login" class="btn primary">-->
+    <!--            <i class="fas fa-plug"></i> Conectar con Spotify (necesario para playlists privadas)-->
+    <!--        </a>-->
+    <!--    </section>-->
 
-<!--    <section class="playlist-section">-->
-<!--        <button id="loadMyPlaylistsBtn" class="btn"><i class="fas fa-sync"></i> Cargar mis playlists</button>-->
-<!--        <select id="playlistSelect" class="select-input" size="10" style="display: none;">-->
-<!--            <option value="">&#45;&#45; Selecciona una playlist &#45;&#45;</option>-->
-<!--        </select>-->
-<!--        <p id="playlistStatus" class="status"></p>-->
-<!--    </section>-->
+    <!--    <section class="playlist-section">-->
+    <!--        <button id="loadMyPlaylistsBtn" class="btn"><i class="fas fa-sync"></i> Cargar mis playlists</button>-->
+    <!--        <select id="playlistSelect" class="select-input" size="10" style="display: none;">-->
+    <!--            <option value="">-- Selecciona una playlist --</option>-->
+    <!--        </select>-->
+    <!--        <p id="playlistStatus" class="status"></p>-->
+    <!--    </section>-->
 
     <section class="playlist-section">
-        <h2>Obtener listas públicas desde un perfil:</h2>
+        <h2>Obtener cartas de playlists públicas desde un perfil:</h2>
         <div class="input-group">
             <input id="friendUsername" type="text" class="text-input"
-                   placeholder="Pega la URL del perfil de Spotify (https://open.spotify.com/user/...)">
+                   placeholder="Pega la URL del perfil de Spotify[](https://open.spotify.com/user/...)">
             <button id="loadFriendPlaylistsBtn" class="btn"><i class="fas fa-user-friends"></i> Cargar playlists públicas</button>
         </div>
-        <select id="friendPlaylistSelect" class="select-input" size="10" style="display: none;">
-            <option value="">-- Selecciona una playlist --</option>
-        </select>
+        <!-- REMOVED: select for friend playlists -->
         <p id="friendStatus" class="status"></p>
     </section>
 

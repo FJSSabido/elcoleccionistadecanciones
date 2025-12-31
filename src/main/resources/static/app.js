@@ -1,3 +1,4 @@
+// Modified: app.js
 
 /*===================
     Paginación.
@@ -121,281 +122,172 @@ function showPlaylistTitle(title, totalTracks = null, isTrack = false) {
     const titleElem = document.getElementById("playlistTitle");
     if (!titleElem || !title) return;
 
-    let prefix = isTrack ? "🎵 Canción" : "🎧 Playlist";
-    let suffix = "";
+    let prefix = isTrack ? "Canción" : "Playlist";
+    let formatted = `${prefix}: ${title}`;
 
-    if (typeof totalTracks === "number") {
-        suffix = ` (${totalTracks} ${totalTracks === 1 ? "canción" : "canciones"})`;
+    if (totalTracks !== null && !isTrack) {
+        formatted += ` (${totalTracks} canciones)`;
     }
 
-    titleElem.textContent = `${prefix}: ${title}${suffix}`;
+    titleElem.textContent = formatted;
     titleElem.style.display = "block";
-}
-
-/*====================================
-    Función para resetear la vista.
-======================================*/
-function resetCardsView() {
-    const titleElem = document.getElementById("playlistTitle");
-    const cardsContainer = document.getElementById("cards");
-    const pagination = document.getElementById("pagination");
-
-    if (titleElem) {
-        titleElem.textContent = "";
-        titleElem.style.display = "none";
-    }
-
-    if (cardsContainer) {
-        cardsContainer.innerHTML = "";
-    }
-
-    if (pagination) {
-        pagination.style.display = "none";
-    }
-
-    allCards = [];
-    currentPage = 1;
-}
-
-// =======================
-// Renderizar cartas
-// =======================
-async function renderCards(url) {
-    if (!url) return;
-
-    updateUrlWithSpotifyUrl(url); // 👈 URL SIEMPRE ACTUALIZADA
-
-    console.log("Intentando generar cartas para URL:", url);
-
-    const cardsContainer = document.getElementById("cards");
-    if (!cardsContainer) return;
-
-    cardsContainer.innerHTML = "";
-
-    const manualStatus = document.getElementById("manualStatus");
-    if (manualStatus) {
-        manualStatus.textContent = "";
-        manualStatus.className = "status";
-    }
-
-    showLoadingPopup(); // 👈 MOSTRAR POPUP AL EMPEZAR
-
-    try {
-        const res = await fetch(`/api/cards?url=${encodeURIComponent(url)}`);
-        console.log("Respuesta fetch:", res.status);
-
-        if (!res.ok) {
-            if (res.status === 401) {
-                cardsContainer.innerHTML =
-                    "<p class='status error'>Error: Debes conectarte con Spotify para esta playlist (puede ser privada).</p>";
-            }
-            throw new Error("Error fetching cards: " + res.status);
-        }
-
-        const cards = await res.json();
-        console.log("Cartas recibidas:", cards.length);
-
-        // 👇 TÍTULO REAL DE PLAYLIST O CANCIÓN (Spotify oficial)
-        const spotifyTitle = await fetchSpotifyTitle(url);
-        if (spotifyTitle) {
-            const isTrack = cards.length === 1;
-            showPlaylistTitle(spotifyTitle, cards.length, isTrack);
-        }
-
-
-        allCards = cards;
-        currentPage = 1;
-        renderPage(currentPage);
-        mostrarBotonCafe();
-
-        // 👇 TODO HA TERMINADO
-        hideLoadingPopup();
-        scrollToCards();
-
-    } catch (e) {
-          console.error("Error rendering cards:", e);
-          hideLoadingPopup();
-
-          resetCardsView(); // 👈 LIMPIA título, cartas y paginación
-
-          const manualStatus = document.getElementById("manualStatus");
-          if (manualStatus) {
-              manualStatus.textContent = "Error al generar cartas. Revisa el enlace de Spotify.";
-              manualStatus.className = "status error";
-          }
-      }
-}
-
-
-/*=========================
-    Mostrar botón café
-===========================*/
-function mostrarBotonCafe() {
-    const bmc = document.querySelector('.bmc-container');
-    if (bmc) {
-        bmc.style.display = 'flex';
-    }
-}
-
-
-// =======================
-// URL compartible
-// =======================
-function updateShareableUrl(userId, playlistId) {
-    const newUrl = `${window.location.origin}${window.location.pathname}?user=${encodeURIComponent(userId)}&playlist=${encodeURIComponent(playlistId)}`;
-    history.pushState({ userId, playlistId }, '', newUrl);
-}
-
-function extractPlaylistId(playlistUrl) {
-    const parts = playlistUrl.split('/playlist/');
-    return parts.length > 1 ? parts[1].split('?')[0] : null;
-}
-
-function extractUserId(profileUrl) {
-    const parts = profileUrl.split('/user/');
-    return parts.length > 1 ? parts[1].split('?')[0] : null;
-}
-
-function updateUrlWithSpotifyUrl(spotifyUrl) {
-    const newUrl = `${window.location.origin}${window.location.pathname}?spotifyUrl=${encodeURIComponent(spotifyUrl)}`;
-    history.pushState({ spotifyUrl }, '', newUrl);
 }
 
 function getSpotifyUrlFromLocation() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("spotifyUrl");
+    return params.get("spotify");
 }
 
+async function renderCards(spotifyUrl) {
+    if (!spotifyUrl) return;
 
-// =======================
-// Playlists de amigo
-// =======================
-async function loadFriendPlaylists(profileUrl, targetPlaylistId = null) {
-    const status = document.getElementById("friendStatus");
-    const select = document.getElementById("friendPlaylistSelect");
+    showLoadingPopup();
 
-    if (!status || !select) return;
+    const cardsContainer = document.getElementById("cards");
+    if (cardsContainer) cardsContainer.innerHTML = "";
 
-    if (!profileUrl) {
-        status.textContent = "Introduce la URL del perfil de Spotify";
-        status.className = "status error";
-        return;
-    }
+    const statusElems = [
+        document.getElementById("manualStatus"),
+        document.getElementById("playlistStatus"),
+        document.getElementById("friendStatus")
+    ].filter(Boolean);
 
-    status.textContent = "Cargando playlists públicas...";
-    status.className = "status";
-    select.style.display = "none";
-    select.innerHTML = "";
+    statusElems.forEach(s => {
+        s.textContent = "";
+        s.className = "status";
+    });
+
+    let playlistTitle = await fetchSpotifyTitle(spotifyUrl);
+    let isTrack = spotifyUrl.includes("/track/");
 
     try {
-        const res = await fetch(`/api/users/playlists?profileUrl=${encodeURIComponent(profileUrl)}`);
+        const res = await fetch(`/api/cards?url=${encodeURIComponent(spotifyUrl)}`);
         if (!res.ok) throw new Error();
 
-        const playlists = await res.json();
+        const data = await res.json();
 
-        playlists.forEach(p => {
-            const option = document.createElement("option");
-            option.value = `https://open.spotify.com/playlist/${p.id}`;
-            option.textContent = `${p.name} (${p.totalTracks} canciones)`;
-            select.appendChild(option);
-        });
+        allCards = data.map(card => ({
+            title: card.title,
+            artist: card.artist,
+            album: card.album,
+            year: card.year,
+            imageUrl: card.imageUrl,
+            spotifyUrl: card.spotifyUrl
+        }));
 
-        select.style.display = "block";
-        status.textContent = "Playlists públicas cargadas";
-        status.className = "status success";
+        renderPage(1);
 
-        if (targetPlaylistId) {
-            const playlistUrl = `https://open.spotify.com/playlist/${targetPlaylistId}`;
-            select.value = playlistUrl;
+        showPlaylistTitle(playlistTitle || "Título desconocido", allCards.length, isTrack);
 
-            if (select.value) {
-                const selectedOption = select.selectedOptions[0];
-                if (selectedOption) {
-                    showPlaylistTitle(selectedOption.textContent);
-                }
-                renderCards(playlistUrl);
-            } else {
-                status.textContent = "La playlist no se encontró";
-                status.className = "status error";
-            }
-        }
     } catch {
-        status.textContent = "No se pudieron cargar playlists públicas";
-        status.className = "status error";
+        statusElems.forEach(s => {
+            s.textContent = "No se pudieron generar las cartas";
+            s.className = "status error";
+        });
+    } finally {
+        hideLoadingPopup();
     }
 }
 
 // =======================
-// Event listeners DEFENSIVOS
+// Cargar playlists propias → Generar cartas directamente
 // =======================
-
-// Botón playlists amigo
-const loadFriendBtn = document.getElementById("loadFriendPlaylistsBtn");
-if (loadFriendBtn) {
-    loadFriendBtn.addEventListener("click", async () => {
-        const input = document.getElementById("friendUsername");
-        if (!input) return;
-        await loadFriendPlaylists(input.value.trim());
-    });
-}
-
-// Botón mis playlists
 const loadMyPlaylistsBtn = document.getElementById("loadMyPlaylistsBtn");
 if (loadMyPlaylistsBtn) {
     loadMyPlaylistsBtn.addEventListener("click", async () => {
         const status = document.getElementById("playlistStatus");
-        const select = document.getElementById("playlistSelect");
 
-        if (!status || !select) return;
+        if (!status) return;
 
         status.textContent = "Cargando tus playlists...";
         status.className = "status";
-        select.style.display = "none";
-        select.innerHTML = "";
+
+        showLoadingPopup();
 
         try {
             const res = await fetch(`/api/my/playlists`);
             if (!res.ok) throw new Error();
 
-            const playlists = await res.json();
+            const data = await res.json();
+            const playlists = data.playlists;
+            const displayName = data.displayName || "Tus";
 
-            playlists.forEach(p => {
-                const option = document.createElement("option");
-                option.value = `https://open.spotify.com/playlist/${p.id}`;
-                option.textContent = `${p.name} (${p.totalTracks} canciones)`;
-                select.appendChild(option);
-            });
+            allCards = playlists.map(p => ({
+                title: p.name,
+                artist: `By ${p.owner}`,
+                album: `${p.totalTracks} tracks`,
+                year: '',
+                imageUrl: p.imageUrl,
+                spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
+            }));
 
-            select.style.display = "block";
-            status.textContent = "Tus playlists cargadas";
+            renderPage(1);
+
+            showPlaylistTitle(`${displayName} playlists`, playlists.length);
+
+            status.textContent = "Tus playlists cargadas como cartas";
             status.className = "status success";
         } catch {
             status.textContent = "No se pudieron cargar tus playlists";
             status.className = "status error";
+        } finally {
+            hideLoadingPopup();
         }
     });
 }
 
-// Select playlist propia
-const playlistSelect = document.getElementById("playlistSelect");
-if (playlistSelect) {
-    playlistSelect.addEventListener("change", e => {
-        renderCards(e.target.value);
-    });
-}
-
-// Select playlist amigo
-const friendPlaylistSelect = document.getElementById("friendPlaylistSelect");
-if (friendPlaylistSelect) {
-    friendPlaylistSelect.addEventListener("change", e => {
-        const playlistUrl = e.target.value;
-        const selectedOption = e.target.selectedOptions[0];
-        if (selectedOption) {
-            showPlaylistTitle(selectedOption.textContent);
-        }
-        renderCards(playlistUrl);
+// =======================
+// Cargar playlists de amigo → Generar cartas directamente
+// =======================
+const loadFriendPlaylistsBtn = document.getElementById("loadFriendPlaylistsBtn");
+if (loadFriendPlaylistsBtn) {
+    loadFriendPlaylistsBtn.addEventListener("click", async () => {
         const input = document.getElementById("friendUsername");
-        if (!input) return;
+        const status = document.getElementById("friendStatus");
+
+        if (!input || !status) return;
+
+        const profileUrl = input.value.trim();
+
+        if (!profileUrl) {
+            status.textContent = "Introduce la URL del perfil de Spotify";
+            status.className = "status error";
+            return;
+        }
+
+        status.textContent = "Cargando playlists públicas...";
+        status.className = "status";
+
+        showLoadingPopup();
+
+        try {
+            const res = await fetch(`/api/users/playlists?profileUrl=${encodeURIComponent(profileUrl)}`);
+            if (!res.ok) throw new Error();
+
+            const data = await res.json();
+            const playlists = data.playlists;
+            const displayName = data.displayName || "el perfil";
+
+            allCards = playlists.map(p => ({
+                title: p.name,
+                artist: `By ${p.owner}`,
+                album: `${p.totalTracks} tracks`,
+                imageUrl: p.imageUrl,
+                spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
+            }));
+
+            renderPage(1);
+
+            showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length);
+
+            status.textContent = "Playlists cargadas como cartas";
+            status.className = "status success";
+        } catch {
+            status.textContent = "No se pudieron cargar las playlists públicas (verifica la URL o si son públicas)";
+            status.className = "status error";
+        } finally {
+            hideLoadingPopup();
+        }
     });
 }
 
@@ -463,5 +355,3 @@ document.getElementById("nextPageBtn")?.addEventListener("click", () => {
         }, 150);
     }
 });
-
-

@@ -1,3 +1,4 @@
+// Modified: UserPlaylistsController.java
 package com.fjssabido.coleccionista_de_canciones.controller;
 
 import com.fjssabido.coleccionista_de_canciones.dto.PlaylistResponseDto;
@@ -25,7 +26,7 @@ public class UserPlaylistsController {
 
     // 🔹 PLAYLISTS DE UN AMIGO (PÚBLICAS)
     @GetMapping("/users/playlists")
-    public List<PlaylistResponseDto> getUserPlaylistsFromProfile(
+    public Map<String, Object> getUserPlaylistsFromProfile(
             @RequestParam String profileUrl,
             HttpSession session
     ) {
@@ -38,8 +39,22 @@ public class UserPlaylistsController {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(appToken);
 
-        String url = "https://api.spotify.com/v1/users/" + userId + "/playlists?limit=50";
-        return fetchPlaylists(url, headers);
+        // NEW: Fetch del perfil del usuario para obtener display_name
+        String userProfileUrl = "https://api.spotify.com/v1/users/" + userId;
+        HttpEntity<Void> profileEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> profileResponse = trackService.getRestTemplate()
+                .exchange(userProfileUrl, HttpMethod.GET, profileEntity, Map.class);
+
+        Map<String, Object> profileBody = profileResponse.getBody();
+        String displayName = profileBody != null ? (String) profileBody.get("display_name") : userId;
+
+        String playlistsUrl = "https://api.spotify.com/v1/users/" + userId + "/playlists?limit=50";
+        List<PlaylistResponseDto> playlists = fetchPlaylists(playlistsUrl, headers);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("displayName", displayName);
+        result.put("playlists", playlists);
+        return result;
     }
 
     // 🔹 FETCH PAGINADO (YA ESTABA BIEN)
@@ -70,7 +85,15 @@ public class UserPlaylistsController {
                             ? (Integer) tracks.get("total")
                             : 0;
 
-                    playlists.add(new PlaylistResponseDto(id, name, totalTracks));
+                    // NEW: Extraer owner
+                    Map<String, Object> ownerMap = (Map<String, Object>) item.get("owner");
+                    String owner = ownerMap != null ? (String) ownerMap.get("display_name") : "Unknown";
+
+                    // NEW: Extraer imageUrl
+                    List<Map<String, Object>> images = (List<Map<String, Object>>) item.get("images");
+                    String imageUrl = images != null && !images.isEmpty() ? (String) images.get(0).get("url") : "";
+
+                    playlists.add(new PlaylistResponseDto(id, name, totalTracks, owner, imageUrl));
                 }
             }
 
