@@ -507,3 +507,17 @@ footer {
         margin-top: 5px;
     }
 }
+
+/* =========================
+   PLAYLIST TITLE COMPACTO EN MÓVIL
+   ========================= */
+@media (max-width: 768px) {
+    .playlist-title {
+        font-size: 0.9rem;        /* más pequeño */
+        padding: 6px 8px;         /* reduce altura */
+        line-height: 1.2;         /* compacta el texto */
+        white-space: nowrap;      /* una sola línea */
+        overflow: hidden;         /* evita crecer */
+        text-overflow: ellipsis;  /* … si es muy largo */
+    }
+}

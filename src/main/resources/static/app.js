@@ -39,6 +39,9 @@ function renderPage(page) {
         const cardElem = document.createElement("div");
         cardElem.className = "card";
 
+        // NEW: Conditionally add year div only if year exists
+        let yearHtml = card.year ? `<div class="year">${card.year}</div>` : '';
+
         cardElem.innerHTML = `
             <div class="card-inner">
                 <div class="card-front">
@@ -49,7 +52,7 @@ function renderPage(page) {
                         <div class="title">${card.title}</div>
                         <div class="artist">${card.artist}</div>
                         <div class="album">${card.album}</div>
-                        <div class="year">${card.year || 'N/A'}</div>
+                        ${yearHtml}
                     </div>
                 </div>
                 <div class="card-back">
@@ -272,6 +275,7 @@ if (loadFriendPlaylistsBtn) {
                 title: p.name,
                 artist: `By ${p.owner}`,
                 album: `${p.totalTracks} tracks`,
+                year: '',
                 imageUrl: p.imageUrl,
                 spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
             }));
