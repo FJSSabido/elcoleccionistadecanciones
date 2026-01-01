@@ -9,11 +9,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- Íconos opcionales -->
 </head>
 <body>
-<div class="container">
-    <header>
-        <h1><i class="fab fa-spotify"></i> El Coleccionista de Canciones 🎧</h1>
-    </header>
+<div class="bmc-container">
+    <script
+            type="text/javascript"
+            src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+            data-name="bmc-button"
+            data-slug="FJSSabido"
+            data-color="#1DB954"
+            data-emoji="☕"
+            data-font="Cookie"
+            data-text="¡Convídame a un café!"
+            data-outline-color="#1DB954"
+            data-font-color="#FFFFFF"
+            data-coffee-color="#FFDD00">
+    </script>
+</div>
+<a href="https://www.buymeacoffee.com/FJSSabido"
+   class="bmc-fab"
+   target="_blank"
+   aria-label="Invítame a un café">
+    ☕
+</a>
 
+<header>
+    <h1><i class="fab fa-spotify"></i> El Coleccionista de Canciones 🎧</h1>
+</header>
+
+<div class="container">
     <section class="unified-section">
         <h2>¡Transforma tus playlists en cartas coleccionables!</h2>
         <div class="input-group">
@@ -24,7 +46,7 @@
         <p id="unifiedStatus" class="status"></p>
     </section>
 
-    <h2 id="playlistTitle" class="playlist-title" style="display: none;"></h2>
+    <h3 id="playlistTitle" class="playlist-title" style="display: none;"></h3>
     <div id="cards" class="cards-container"></div>
     <div id="pagination" style="display:none; text-align:center; margin-bottom:30px;">
         <button id="prevPageBtn" class="btn">⬅</button>
@@ -45,21 +67,6 @@
 </div>
 
 <footer>
-    <div class="bmc-container">
-        <script
-                type="text/javascript"
-                src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-                data-name="bmc-button"
-                data-slug="FJSSabido"
-                data-color="#1DB954"
-                data-emoji="☕"
-                data-font="Cookie"
-                data-text="¡Convídame a un café!"
-                data-outline-color="#1DB954"
-                data-font-color="#FFFFFF"
-                data-coffee-color="#FFDD00">
-        </script>
-    </div>
     <a class="footer-link"
        href="https://www.linkedin.com/in/francisco-javier-sanchez-sabido/">Contacto
     </a>

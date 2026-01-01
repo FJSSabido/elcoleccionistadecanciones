@@ -97,8 +97,8 @@ function renderPage(page) {
                     </div>
                 </div>
                 <div class="card-back">
+                    <p class="scan">www.elcoleccionistadecanciones.com</p>
                     <div class="qr"></div>
-                    <p class="scan">Escanea en Spotify</p>
                 </div>
             </div>
         `;
@@ -146,7 +146,6 @@ async function fetchSpotifyTitle(spotifyUrl) {
 async function renderCards(url) {
     const status = document.getElementById("unifiedStatus");
     if(status) {
-        status.textContent = "Cargando cartas...";
         status.className = "status";
     }
 
@@ -189,7 +188,6 @@ async function renderCards(url) {
         showPlaylistTitle(titleContext, allCards.length, isTrack ? 'canción' : 'canciones');
 
         if(status) {
-            status.textContent = "Cartas cargadas";
             status.className = "status success";
         }
     } catch (e) {
@@ -215,7 +213,6 @@ async function loadFriendPlaylists(profileUrl) {
     }
 
     if(status) {
-        status.textContent = "Cargando playlists públicas...";
         status.className = "status";
     }
     showLoadingPopup();
@@ -243,7 +240,6 @@ async function loadFriendPlaylists(profileUrl) {
         showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length, 'playlists');
 
         if(status) {
-            status.textContent = "Playlists cargadas como cartas";
             status.className = "status success";
         }
     } catch {
@@ -263,7 +259,10 @@ async function loadFriendPlaylists(profileUrl) {
 function showPlaylistTitle(name, count, unit = 'canciones') {
     const titleElem = document.getElementById("playlistTitle");
     if(titleElem) {
-        titleElem.textContent = `${name} (${count} ${unit})`;
+        titleElem.innerHTML = `
+            <span class="playlist-main">${name}</span>
+            <span class="playlist-count">(${count} ${unit})</span>
+        `;
         titleElem.style.display = "block";
     }
 }
