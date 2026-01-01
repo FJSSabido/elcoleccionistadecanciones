@@ -100,4 +100,12 @@ public class TrackCardDto {
     public String getDuration() {
         return duration;
     }
+
+    public String getName() {
+        return title;
+    }
+
+    public String getCoverUrl() {
+        return imageUrl;
+    }
 }

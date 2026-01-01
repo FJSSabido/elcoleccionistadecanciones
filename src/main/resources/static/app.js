@@ -145,57 +145,34 @@ async function fetchSpotifyTitle(spotifyUrl) {
 // Carga principal de cartas (Tracks o Playlists por URL)
 async function renderCards(url) {
     const status = document.getElementById("unifiedStatus");
-    if(status) {
-        status.className = "status";
-    }
+    status.textContent = "";
+    status.className = "status";
 
     showLoadingPopup();
 
     try {
-        const res = await fetch(`/api/cards?url=${encodeURIComponent(url)}`);
-        if (!res.ok) throw new Error();
-
-        // Si la respuesta es un array directo o un objeto con "cards"
-        const jsonResponse = await res.json();
-
-        let rawCards = [];
-        let titleContext = "Colección";
-        let type = "playlist";
-
-        if (Array.isArray(jsonResponse)) {
-            rawCards = jsonResponse; // Soporte legacy si devuelve array directo
-        } else {
-            rawCards = jsonResponse.cards || [];
-            titleContext = jsonResponse.name || "Playlist";
-            type = jsonResponse.type;
+        const response = await fetch('/api/cards?url=' + encodeURIComponent(url));
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
 
-        // FIX: Mapeo de datos asegurando que duration y year se guarden
-        allCards = rawCards.map(card => ({
-            title: card.title,
-            artist: card.artist,
-            album: card.album,
-            year: card.year,         // <--- Importante
-            duration: card.duration, // <--- Importante: Antes faltaba esto
-            imageUrl: card.imageUrl,
-            spotifyUrl: card.spotifyUrl
-        }));
+        const data = await response.json();
+        allCards = data.cards || [];
+        currentPage = 1;
 
-        renderPage(1);
+        // FIX: Unidad singular/plural
+        const unit = allCards.length === 1 ? 'canción' : 'canciones';
+
+        showPlaylistTitle(data.name, allCards.length, unit);
+        renderPage(currentPage);
+        scrollToCards();
         showCoffeeButton();
 
-        const isTrack = type === 'track';
-        showPlaylistTitle(titleContext, allCards.length, isTrack ? 'canción' : 'canciones');
-
-        if(status) {
-            status.className = "status success";
-        }
-    } catch (e) {
-        console.error(e);
-        if(status) {
-            status.textContent = "Error al cargar (verifica la URL o si es pública)";
-            status.className = "status error";
-        }
+        status.className = "status success";
+    } catch (error) {
+        console.error("Error:", error);
+        status.textContent = error.message || "Error al generar las cartas";
+        status.className = "status error";
     } finally {
         hideLoadingPopup();
     }

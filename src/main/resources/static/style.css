@@ -276,7 +276,7 @@ a.card-link {
     margin-left: calc(-50vw + 50%);
 
     text-align: center;
-    padding: 2px 0 4px;   /* 👈 CLAVE: casi sin aire */
+    padding: 6px 0 6px;   /* 👈 CLAVE: casi sin aire */
 
     background-color: #f0f0f0;
     color: #1DB954;
@@ -674,11 +674,12 @@ header {
 
 .playlist-title {
     line-height: 1;
+    margin: 10;
 }
 
 .playlist-main {
     display: block;
-    margin: 0;
+    margin: 10;
 }
 
 .playlist-count {
@@ -689,6 +690,9 @@ header {
     opacity: 0.85;
 }
 
+.unified-section h2 {
+    color: #1DB954; /* verde Spotify */
+}
 
 
 
