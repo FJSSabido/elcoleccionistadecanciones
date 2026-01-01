@@ -108,6 +108,7 @@ h2 {
     padding: 0 20px;
     justify-items: center;
     padding-bottom: 60px;
+    margin-bottom: 5px;   /* 👈 ajusta a gusto: 40–80px */
 }
 
 /* Cartas: fondo negro, cover grande, texto estilizado */
@@ -150,7 +151,7 @@ h2 {
 }
 
 .cover-wrapper {
-    height: 62mm; /* Cover grande */
+    height: 60mm; /* Cover grande */
     padding: 3px;
     display: flex;
     justify-content: center;
@@ -261,11 +262,8 @@ a.card-link {
 
 .playlist-title {
     position: sticky;
-    top: 90px;
+    top: 40px;
     z-index: 10;
-
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
 
     text-align: center;
     padding: 6px 0 6px;   /* 👈 CLAVE: casi sin aire */
@@ -394,11 +392,6 @@ footer {
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-
-#cards {
-    margin-bottom: 5px;   /* 👈 ajusta a gusto: 40–80px */
-}
-
 #pagination {
     margin-bottom: 80px;   /* espacio para el botón ☕ */
 }
@@ -412,10 +405,13 @@ footer {
         display: none !important;
     }
     #cards {
-        grid-template-columns: repeat(2, 1fr); /* 👈 2 cartas por fila */
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 👈 2 cartas por fila */
         gap: 14px;
-        padding: 0 10px;
+        padding: 0 8px;
         padding-bottom: 120px;
+
+        padding-left: 0;
+        padding-right: 0;
     }
     /* 🔥 PRIORIDAD: carta única SIEMPRE centrada */
     #cards.single-card {
@@ -423,6 +419,7 @@ footer {
         justify-items: center;
     }
     #cards.single-card .card {
+        width: 100%;
         max-width: 240px;
     }
     #cards.single-card a.card-link {
@@ -481,38 +478,45 @@ footer {
         white-space: nowrap;      /* una sola línea */
         overflow: hidden;         /* evita crecer */
         text-overflow: ellipsis;  /* … si es muy largo */
+
+        width: 100%;
+        margin-left: 0;
     }
     #pagination {
      margin-bottom: 140px;  /* si hay paginación */
     }
     /* Carta */
     .card {
-        width: 240px;
+        width: 100%;
         height: auto;
+        max-width: 180px;
         aspect-ratio: 63 / 88;
     }
 
     /* Cover */
     .cover-wrapper {
         height: auto;
+        padding-top: 6px;
     }
 
     .cover {
         aspect-ratio: 1 / 1;
         object-fit: cover;
+        max-height: 150px;
     }
 
     /* Texto */
     .info {
-        padding: 6px 6px 8px;
+        min-height: 64px; /* estabiliza la zona de texto */
+        padding: 6px 6px 6px;
         gap: 1px;
-        justify-content: flex-start;
+        justify-content: center;
         text-align: center;
     }
 
     .title {
-        font-size: 11px;
-        line-height: 1.05;
+        font-size: 13px;
+        line-height: 1.1;
         margin: 0;
         font-weight: 600;
 
@@ -523,19 +527,19 @@ footer {
     }
 
     .artist {
-        font-size: 10px;
-        line-height: 1.05;
+        font-size: 11px;
+        line-height: 1.1;
         margin: 0;
     }
 
     .album {
-        font-size: 9px;
-        line-height: 1.05;
+        font-size: 10px;
+        line-height: 1.1;
         margin: 0;
     }
 
     .year {
-        font-size: 9px;
+        font-size: 10px;
         line-height: 1;
         margin: 0;
         opacity: 0.8;
@@ -556,6 +560,9 @@ footer {
         padding: 4px 8px;          /* 👈 mínimo real */
         padding-bottom: 0;   /* 👈 elimina el aire */
         margin-bottom: 0;    /* 👈 por si acaso */
+
+        width: 100%;
+        margin-left: 0;
     }
 
     header h1 {
@@ -583,6 +590,9 @@ footer {
 
     .footer-content p {
         font-size: 0.8rem;
+    }
+    .container {
+        padding: 16px 12px;
     }
 }
 /* Móvil en horizontal → 4 columnas */
@@ -633,20 +643,12 @@ header {
     top: 0;
     z-index: 1000; /* 👈 más alto que playlist-title */
 
-    width: 100vw;                      /* 👈 ancho total */
-    margin-left: calc(-50vw + 50%);    /* 👈 rompe el container */
-
     background-color: #f0f0f0; /* importante para que tape lo de debajo */
 
     text-align: center;
     padding: 10px 0;
 
     border-bottom: 1px solid #ddd;
-}
-
-.playlist-title {
-    line-height: 1;
-    margin: 10;
 }
 
 .playlist-main {
