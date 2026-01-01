@@ -538,5 +538,53 @@ footer {
     text-align: center !important;
 }
 
+/* =========================
+   ESTILOS DEL FOOTER
+   ========================= */
+.main-footer {
+    background-color: #ffffff;
+    border-top: 2px solid #1DB954; /* El verde de Spotify */
+    padding: 40px 20px;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-content p {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Ajuste del botón de Buy Me a Coffee */
+.bmc-container {
+    display: none; /* Se activa por JS en app.js al cargar cartas */
+    transition: opacity 0.3s ease;
+}
+
+/* Responsivo para el footer */
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 30px 15px;
+        margin-top: 30px;
+    }
+
+    .footer-content p {
+        font-size: 0.8rem;
+    }
+}
+
+header {
+    position: sticky;
+    top: 0;
+}
 
 
