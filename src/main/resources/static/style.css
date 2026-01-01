@@ -259,14 +259,6 @@ a.card-link {
     color: inherit;
 }
 
-.card-inner {
-    pointer-events: none;
-}
-
-.card-front, .card-back {
-    pointer-events: auto;
-}
-
 .playlist-title {
     position: sticky;
     top: 90px;
@@ -340,7 +332,7 @@ a.card-link {
 #cards.single-card a.card-link {
     grid-column: 1 / -1;      /* ocupa tó el grid */
     justify-self: center;     /* centra el link */
-    width: auto;              /* deja que ajuste al contenido */
+    width: fit-content;              /* deja que ajuste al contenido */
 }
 
 /* =====================
@@ -419,45 +411,26 @@ footer {
     .bmc-container {
         display: none !important;
     }
-
-    /* FAB real */
-        .bmc-fab {
-            display: flex;
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-
-            width: 52px;
-            height: 52px;
-
-            background-color: #1DB954;
-            color: #fff;
-
-            border-radius: 50%;
-            font-size: 24px;
-
-            align-items: center;
-            justify-content: center;
-
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-            z-index: 9999;
-
-            text-decoration: none;
-        }
-
-        .bmc-fab:active {
-            transform: scale(0.95);
-        }
-
     #cards {
         grid-template-columns: repeat(2, 1fr); /* 👈 2 cartas por fila */
         gap: 14px;
         padding: 0 10px;
         padding-bottom: 120px;
     }
+    /* 🔥 PRIORIDAD: carta única SIEMPRE centrada */
+    #cards.single-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    #cards.single-card .card {
+        max-width: 240px;
+    }
+    #cards.single-card a.card-link {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: fit-content;
+    }
 
-    h1 { font-size: 2rem; }
-    .btn { padding: 12px 20px; }
     /* Botón flotante real */
     .bmc-fab {
         display: flex;
@@ -487,6 +460,13 @@ footer {
     .bmc-fab:active {
         transform: scale(0.95);
     }
+
+    h1 { font-size: 2rem; }
+    .btn { padding: 12px 20px; }
+
+    .bmc-fab:active {
+        transform: scale(0.95);
+    }
     .playlist-title {
         top: 40px;       /* 👈 altura real del header móvil */
         padding: 6px 8px;         /* reduce altura */
@@ -507,8 +487,7 @@ footer {
     }
     /* Carta */
     .card {
-        width: 100%;
-        max-width: 170px;
+        width: 240px;
         height: auto;
         aspect-ratio: 63 / 88;
     }
@@ -665,13 +644,6 @@ header {
     border-bottom: 1px solid #ddd;
 }
 
-/* =========================
-   FAB ☕ SOLO EN MÓVIL
-   ========================= */
-.bmc-fab {
-    display: none;
-}
-
 .playlist-title {
     line-height: 1;
     margin: 10;
@@ -684,7 +656,7 @@ header {
 
 .playlist-count {
     display: block;
-    margin-top: -3px;   /* 👈 aquí está la magia */
+    margin-top: 3px;   /* 👈 aquí está la magia */
     margin-bottom: 0px;
     font-size: 0.8rem;
     opacity: 0.85;
