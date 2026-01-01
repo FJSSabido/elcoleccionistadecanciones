@@ -15,39 +15,16 @@
         <p>¡Transforma tus playlists en cartas coleccionables!</p>
     </header>
 
-    <!--    <section class="connect-section">-->
-    <!--        <a href="/spotify/login" class="btn primary">-->
-    <!--            <i class="fas fa-plug"></i> Conectar con Spotify (necesario para playlists privadas)-->
-    <!--        </a>-->
-    <!--    </section>-->
-
-    <!--    <section class="playlist-section">-->
-    <!--        <button id="loadMyPlaylistsBtn" class="btn"><i class="fas fa-sync"></i> Cargar mis playlists</button>-->
-    <!--        <select id="playlistSelect" class="select-input" size="10" style="display: none;">-->
-    <!--            <option value="">-- Selecciona una playlist --</option>-->
-    <!--        </select>-->
-    <!--        <p id="playlistStatus" class="status"></p>-->
-    <!--    </section>-->
-
-    <section class="playlist-section">
-        <h2>Obtener cartas de playlists públicas desde un perfil:</h2>
+    <section class="unified-section">
+        <h2>Introduce una URL de Spotify:</h2>
         <div class="input-group">
-            <input id="friendUsername" type="text" class="text-input"
-                   placeholder="Pega la URL del perfil de Spotify[](https://open.spotify.com/user/...)">
-            <button id="loadFriendPlaylistsBtn" class="btn"><i class="fas fa-user-friends"></i> Cargar playlists públicas</button>
+            <input id="spotifyInput" type="text" class="text-input"
+                   placeholder="Pega URL de perfil, playlist o canción de Spotify (ej: https://open.spotify.com/...)">
+            <button id="loadUnifiedBtn" class="btn"><i class="fas fa-link"></i> Generar cartas</button>
         </div>
-        <!-- REMOVED: select for friend playlists -->
-        <p id="friendStatus" class="status"></p>
+        <p id="unifiedStatus" class="status"></p>
     </section>
 
-    <section class="manual-section">
-        <h2>Crear cartas desde playlist o canción:</h2>
-        <div class="input-group">
-            <input id="spotifyUrl" type="text" class="text-input" placeholder="Pega un enlace a playlist o canción de Spotify">
-            <button id="loadBtn" class="btn"><i class="fas fa-link"></i> Generar cartas desde enlace</button>
-            <p id="manualStatus" class="status"></p>
-        </div>
-    </section>
     <h2 id="playlistTitle" class="playlist-title" style="display: none;"></h2>
     <div id="cards" class="cards-container"></div>
     <div id="pagination" style="display:none; text-align:center; margin-bottom:30px;">

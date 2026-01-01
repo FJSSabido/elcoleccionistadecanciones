@@ -1,7 +1,8 @@
+// Modified: CardsController.java
 package com.fjssabido.coleccionista_de_canciones.controller;
 
 import com.fjssabido.coleccionista_de_canciones.dto.TrackCardDto;
-import com.fjssabido.coleccionista_de_canciones.service.SpotifyAppAuthService; // FIX: Agregar import
+import com.fjssabido.coleccionista_de_canciones.service.SpotifyAppAuthService;
 import com.fjssabido.coleccionista_de_canciones.service.SpotifyCardService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,13 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class CardsController {
 
     private final SpotifyCardService cardService;
-    private final SpotifyAppAuthService appAuthService; // FIX: Inyectar para app token
+    private final SpotifyAppAuthService appAuthService;
 
     public CardsController(SpotifyCardService cardService, SpotifyAppAuthService appAuthService) {
         this.cardService = cardService;
@@ -24,7 +26,7 @@ public class CardsController {
     }
 
     @GetMapping("/cards")
-    public List<TrackCardDto> generateCards(
+    public Map<String, Object> generateCards(
             @RequestParam String url,
             HttpSession session
     ) {
@@ -47,6 +49,6 @@ public class CardsController {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
 
-        return cardService.generateCardsFromUrl(url, headers);
+        return cardService.generateCardsFromUrl(url, headers); // Now returns Map
     }
 }

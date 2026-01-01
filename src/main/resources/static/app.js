@@ -1,44 +1,51 @@
+/* Modified: app.js */
 
-/*======================================
-    Mantener las URL para las playlist.
-========================================*/
-function updateUrlWithProfile(profileUrl) {
+// ==========================================
+// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
+// ==========================================
+const PAGE_SIZE = 100;
+let allCards = [];
+let currentPage = 1;
+
+// ==========================================
+// 2. FUNCIONES DE NAVEGACIÓN Y URL
+// ==========================================
+
+function updateUrlWithInput(url, type) {
     const params = new URLSearchParams(window.location.search);
-    params.set("profile", profileUrl);
-    params.delete("spotify"); // evita estados mezclados
-
-    const newUrl =
-        window.location.pathname + "?" + params.toString();
-
+    if (type === 'profile') {
+        params.set("profile", url);
+        params.delete("spotify");
+    } else {
+        params.set("spotify", url);
+        params.delete("profile");
+    }
+    const newUrl = window.location.pathname + "?" + params.toString();
     window.history.pushState({}, "", newUrl);
 }
 
+function updateUrlWithProfile(profileUrl) {
+    const params = new URLSearchParams(window.location.search);
+    params.set("profile", profileUrl);
+    params.delete("spotify");
+    const newUrl = window.location.pathname + "?" + params.toString();
+    window.history.pushState({}, "", newUrl);
+}
 
-/*======================================
-    Mantener las URL para las canciones.
-========================================*/
 function updateUrlWithSpotify(spotifyUrl) {
     const params = new URLSearchParams(window.location.search);
-
     if (spotifyUrl) {
         params.set("spotify", spotifyUrl);
     } else {
         params.delete("spotify");
     }
-
-    const newUrl =
-        window.location.pathname +
-        (params.toString() ? "?" + params.toString() : "");
-
+    const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
     window.history.pushState({}, "", newUrl);
 }
 
-/*===================
-    Paginación.
-=====================*/
-const PAGE_SIZE = 100;
-let allCards = [];
-let currentPage = 1;
+// ==========================================
+// 3. RENDERIZADO DE CARTAS (PAGINACIÓN)
+// ==========================================
 
 function renderPage(page) {
     const cardsContainer = document.getElementById("cards");
@@ -55,13 +62,12 @@ function renderPage(page) {
     const end = start + PAGE_SIZE;
     const pageCards = allCards.slice(start, end);
 
-    // 👇 Centrar carta si solo hay una en la página
+    // Centrar carta si solo hay una en la página
     if (pageCards.length === 1) {
         cardsContainer.classList.add("single-card");
     } else {
         cardsContainer.classList.remove("single-card");
     }
-
 
     pageCards.forEach(card => {
         const cardLink = document.createElement("a");
@@ -72,14 +78,16 @@ function renderPage(page) {
         const cardElem = document.createElement("div");
         cardElem.className = "card";
 
-        // NEW: Conditionally add year div only if year exists
-        let yearHtml = card.year ? `<div class="year">${card.year}</div>` : '';
+        // FIX: Generar HTML de año y duración solo si existen
+        const yearHtml = card.year ? `<div class="year">${card.year}</div>` : '';
+        const durationHtml = card.duration ? `<div class="duration">${card.duration}</div>` : '';
 
+        // FIX: Estructura HTML que coincide con tu style.css
         cardElem.innerHTML = `
             <div class="card-inner">
                 <div class="card-front">
                     <div class="cover-wrapper">
-                        <img class="cover" src="${card.imageUrl}" alt="${card.title}">
+                        <img class="cover" src="${card.imageUrl}" alt="${card.title}" crossorigin="anonymous">
                     </div>
                     <div class="info">
                         <div class="title">${card.title}</div>
@@ -90,6 +98,7 @@ function renderPage(page) {
                 </div>
                 <div class="card-back">
                     <div class="qr"></div>
+                    <p class="scan">Escanea en Spotify</p>
                 </div>
             </div>
         `;
@@ -97,35 +106,35 @@ function renderPage(page) {
         cardLink.appendChild(cardElem);
         cardsContainer.appendChild(cardLink);
 
+        // Generar QR
         new QRCode(cardElem.querySelector(".qr"), {
             text: card.spotifyUrl,
-            width: 128,
-            height: 128,
+            width: 64,
+            height: 64,
             correctLevel: QRCode.CorrectLevel.H
         });
     });
 
     const totalPages = Math.ceil(allCards.length / PAGE_SIZE);
-
     pageInfo.textContent = `Página ${page} de ${totalPages}`;
-    prevBtn.disabled = page === 1;
-    nextBtn.disabled = page === totalPages;
+
+    // Control de botones
+    if(prevBtn) prevBtn.disabled = page === 1;
+    if(nextBtn) nextBtn.disabled = page === totalPages;
 
     pagination.style.display = totalPages > 1 ? "block" : "none";
 
     scrollToCards();
 }
 
+// ==========================================
+// 4. LÓGICA DE CARGA DE DATOS (FETCH)
+// ==========================================
 
-
-/*PINTAR EL TÍTULO DE LAS PLAYLISTS*/
 async function fetchSpotifyTitle(spotifyUrl) {
     try {
-        const res = await fetch(
-            `https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`
-        );
+        const res = await fetch(`https://open.spotify.com/oembed?url=$${encodeURIComponent(spotifyUrl)}`);
         if (!res.ok) return null;
-
         const data = await res.json();
         return data.title || null;
     } catch {
@@ -133,8 +142,132 @@ async function fetchSpotifyTitle(spotifyUrl) {
     }
 }
 
+// Carga principal de cartas (Tracks o Playlists por URL)
+async function renderCards(url) {
+    const status = document.getElementById("unifiedStatus");
+    if(status) {
+        status.textContent = "Cargando cartas...";
+        status.className = "status";
+    }
 
-/*GESTIÓN DEL POPUP DE CARGA*/
+    showLoadingPopup();
+
+    try {
+        const res = await fetch(`/api/cards?url=${encodeURIComponent(url)}`);
+        if (!res.ok) throw new Error();
+
+        // Si la respuesta es un array directo o un objeto con "cards"
+        const jsonResponse = await res.json();
+
+        let rawCards = [];
+        let titleContext = "Colección";
+        let type = "playlist";
+
+        if (Array.isArray(jsonResponse)) {
+            rawCards = jsonResponse; // Soporte legacy si devuelve array directo
+        } else {
+            rawCards = jsonResponse.cards || [];
+            titleContext = jsonResponse.name || "Playlist";
+            type = jsonResponse.type;
+        }
+
+        // FIX: Mapeo de datos asegurando que duration y year se guarden
+        allCards = rawCards.map(card => ({
+            title: card.title,
+            artist: card.artist,
+            album: card.album,
+            year: card.year,         // <--- Importante
+            duration: card.duration, // <--- Importante: Antes faltaba esto
+            imageUrl: card.imageUrl,
+            spotifyUrl: card.spotifyUrl
+        }));
+
+        renderPage(1);
+        showCoffeeButton();
+
+        const isTrack = type === 'track';
+        showPlaylistTitle(titleContext, allCards.length, isTrack ? 'canción' : 'canciones');
+
+        if(status) {
+            status.textContent = "Cartas cargadas";
+            status.className = "status success";
+        }
+    } catch (e) {
+        console.error(e);
+        if(status) {
+            status.textContent = "Error al cargar (verifica la URL o si es pública)";
+            status.className = "status error";
+        }
+    } finally {
+        hideLoadingPopup();
+    }
+}
+
+// Carga de Playlists de un Amigo (Perfil)
+async function loadFriendPlaylists(profileUrl) {
+    const status = document.getElementById("unifiedStatus");
+    if (!profileUrl) {
+        if(status) {
+            status.textContent = "Introduce una URL válida";
+            status.className = "status error";
+        }
+        return;
+    }
+
+    if(status) {
+        status.textContent = "Cargando playlists públicas...";
+        status.className = "status";
+    }
+    showLoadingPopup();
+
+    try {
+        const res = await fetch(`/api/users/playlists?profileUrl=${encodeURIComponent(profileUrl)}`);
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+        const playlists = data.playlists;
+        const displayName = data.displayName || "el perfil";
+
+        allCards = playlists.map(p => ({
+            title: p.name,
+            artist: `De ${p.owner}`,
+            album: `${p.totalTracks} canciones`,
+            year: '',      // Playlists no suelen tener año único
+            duration: '',  // Playlists no tienen duración única en la carta resumen
+            imageUrl: p.imageUrl,
+            spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
+        }));
+
+        renderPage(1);
+        showCoffeeButton();
+        showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length, 'playlists');
+
+        if(status) {
+            status.textContent = "Playlists cargadas como cartas";
+            status.className = "status success";
+        }
+    } catch {
+        if(status) {
+            status.textContent = "No se pudieron cargar las playlists públicas";
+            status.className = "status error";
+        }
+    } finally {
+        hideLoadingPopup();
+    }
+}
+
+// ==========================================
+// 5. MANEJO DE UI (TÍTULOS, POPUPS, SCROLL)
+// ==========================================
+
+function showPlaylistTitle(name, count, unit = 'canciones') {
+    const titleElem = document.getElementById("playlistTitle");
+    if(titleElem) {
+        titleElem.textContent = `${name} (${count} ${unit})`;
+        titleElem.style.display = "block";
+    }
+}
+
 function showLoadingPopup() {
     const popup = document.getElementById("loadingPopup");
     if (popup) popup.style.display = "flex";
@@ -152,215 +285,82 @@ function scrollToCards() {
     }
 }
 
-
-/*MOSTRAR EL TITULO DE LA PLAYLIST*/
-function showPlaylistTitle(title, totalTracks = null, isTrack = false) {
-    const titleElem = document.getElementById("playlistTitle");
-    if (!titleElem || !title) return;
-
-    let prefix = isTrack ? "Canción" : "Playlist";
-    let formatted = `${prefix}: ${title}`;
-
-    if (totalTracks !== null && !isTrack) {
-        formatted += ` (${totalTracks} canciones)`;
-    }
-
-    titleElem.textContent = formatted;
-    titleElem.style.display = "block";
-}
-
-function getSpotifyUrlFromLocation() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("spotify");
-}
-
-async function renderCards(spotifyUrl) {
-    if (!spotifyUrl) return;
-
-    showLoadingPopup();
-
-    const cardsContainer = document.getElementById("cards");
-    if (cardsContainer) cardsContainer.innerHTML = "";
-
-    const statusElems = [
-        document.getElementById("manualStatus"),
-        document.getElementById("playlistStatus"),
-        document.getElementById("friendStatus")
-    ].filter(Boolean);
-
-    statusElems.forEach(s => {
-        s.textContent = "";
-        s.className = "status";
-    });
-
-    let playlistTitle = await fetchSpotifyTitle(spotifyUrl);
-    let isTrack = spotifyUrl.includes("/track/");
-
-    try {
-        const res = await fetch(`/api/cards?url=${encodeURIComponent(spotifyUrl)}`);
-        if (!res.ok) throw new Error();
-
-        const data = await res.json();
-
-        allCards = data.map(card => ({
-            title: card.title,
-            artist: card.artist,
-            album: card.album,
-            year: card.year,
-            imageUrl: card.imageUrl,
-            spotifyUrl: card.spotifyUrl
-        }));
-
-        renderPage(1);
-
-        showPlaylistTitle(playlistTitle || "Título desconocido", allCards.length, isTrack);
-
-    } catch {
-        statusElems.forEach(s => {
-            s.textContent = "No se pudieron generar las cartas";
-            s.className = "status error";
-        });
-    } finally {
-        hideLoadingPopup();
-    }
-}
-
-
-// =======================
-// Cargar playlists de amigo → Generar cartas directamente
-// =======================
-const loadFriendPlaylistsBtn = document.getElementById("loadFriendPlaylistsBtn");
-if (loadFriendPlaylistsBtn) {
-    loadFriendPlaylistsBtn.addEventListener("click", async () => {
-        const input = document.getElementById("friendUsername");
-        const status = document.getElementById("friendStatus");
-
-        if (!input || !status) return;
-
-        const profileUrl = input.value.trim();
-
-        if (!profileUrl) {
-            status.textContent = "Introduce la URL del perfil de Spotify";
-            status.className = "status error";
-            return;
-        }
-
-        status.textContent = "Cargando playlists públicas...";
-        status.className = "status";
-
-        showLoadingPopup();
-
-        try {
-            const res = await fetch(`/api/users/playlists?profileUrl=${encodeURIComponent(profileUrl)}`);
-            if (!res.ok) throw new Error();
-
-            const data = await res.json();
-            const playlists = data.playlists;
-            const displayName = data.displayName || "el perfil";
-
-            allCards = playlists.map(p => ({
-                title: p.name,
-                artist: `By ${p.owner}`,
-                album: `${p.totalTracks} tracks`,
-                year: '',
-                imageUrl: p.imageUrl,
-                spotifyUrl: `https://open.spotify.com/playlist/${p.id}`
-            }));
-
-            renderPage(1);
-            showCoffeeButton();
-            showPlaylistTitle(`Playlists públicas de ${displayName}`, playlists.length);
-            updateUrlWithProfile(profileUrl);
-
-            status.textContent = "Playlists cargadas como cartas";
-            status.className = "status success";
-        } catch {
-            status.textContent = "No se pudieron cargar las playlists públicas (verifica la URL o si son públicas)";
-            status.className = "status error";
-        } finally {
-            hideLoadingPopup();
-        }
-    });
-}
-
-// Enlace manual
-const loadBtn = document.getElementById("loadBtn");
-if (loadBtn) {
-    loadBtn.addEventListener("click", () => {
-        const input = document.getElementById("spotifyUrl");
-        const status = document.getElementById("manualStatus");
-
-        if (!input || !status) return;
-
-        const url = input.value.trim();
-
-        if (!url) {
-            status.textContent = "Introduce un enlace de Spotify (playlist o canción)";
-            status.className = "status error";
-            return;
-        }
-
-        status.textContent = "";
-        status.className = "status";
-
-        renderCards(url);
-        showCoffeeButton();
-        updateUrlWithSpotify(url);
-    });
-}
-
-
-// =======================
-// Init desde URL compartida
-// =======================
-window.addEventListener("load", () => {
-    const params = new URLSearchParams(window.location.search);
-    const spotifyUrl = params.get("spotify");
-    const profileUrl = params.get("profile");
-
-    if (spotifyUrl) {
-        renderCards(spotifyUrl);
-        showCoffeeButton();
-    } else if (profileUrl) {
-        document.getElementById("friendUsername").value = profileUrl;
-        document.getElementById("loadFriendPlaylistsBtn").click();
-    }
-});
-
-
-
-/*==================================
-    Necesario para la paginación
-====================================*/
-document.getElementById("prevPageBtn")?.addEventListener("click", () => {
-    if (currentPage > 1) {
-        showLoadingPopup();              // 👈 mostrar popup
-        currentPage--;
-
-        // pequeño delay para que el popup se vea
-        setTimeout(() => {
-            renderPage(currentPage);
-            hideLoadingPopup();          // 👈 ocultar popup
-        }, 150);
-    }
-});
-
-document.getElementById("nextPageBtn")?.addEventListener("click", () => {
-    const totalPages = Math.ceil(allCards.length / PAGE_SIZE);
-    if (currentPage < totalPages) {
-        showLoadingPopup();              // 👈 mostrar popup
-        currentPage++;
-
-        setTimeout(() => {
-            renderPage(currentPage);
-            hideLoadingPopup();          // 👈 ocultar popup
-        }, 150);
-    }
-});
-
 function showCoffeeButton() {
     const bmc = document.querySelector('.bmc-container');
     if (bmc) {
         bmc.style.display = 'block';
     }
 }
+
+// ==========================================
+// 6. EVENT LISTENERS
+// ==========================================
+
+// Botón "Generar cartas" (Unificado)
+const loadUnifiedBtn = document.getElementById("loadUnifiedBtn");
+if (loadUnifiedBtn) {
+    loadUnifiedBtn.addEventListener("click", () => {
+        const input = document.getElementById("spotifyInput");
+        const url = input.value.trim();
+        const status = document.getElementById("unifiedStatus");
+
+        // Validación básica de URL de Spotify
+        if (!url || !url.includes('spotify.com')) {
+            status.textContent = "Introduce una URL válida de Spotify";
+            status.className = "status error";
+            return;
+        }
+
+        if (url.includes('/user/')) {
+            loadFriendPlaylists(url);
+            updateUrlWithInput(url, 'profile');
+        } else if (url.includes('/playlist/') || url.includes('/track/') || url.includes('/album/')) {
+            renderCards(url);
+            updateUrlWithInput(url, 'spotify');
+        } else {
+            status.textContent = "URL no soportada (debe ser perfil, playlist o canción)";
+            status.className = "status error";
+        }
+    });
+}
+
+// Paginación: Anterior
+document.getElementById("prevPageBtn")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+        showLoadingPopup();
+        currentPage--;
+        setTimeout(() => {
+            renderPage(currentPage);
+            hideLoadingPopup();
+        }, 150);
+    }
+});
+
+// Paginación: Siguiente
+document.getElementById("nextPageBtn")?.addEventListener("click", () => {
+    const totalPages = Math.ceil(allCards.length / PAGE_SIZE);
+    if (currentPage < totalPages) {
+        showLoadingPopup();
+        currentPage++;
+        setTimeout(() => {
+            renderPage(currentPage);
+            hideLoadingPopup();
+        }, 150);
+    }
+});
+
+// Init desde URL compartida al cargar la página
+window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const spotifyUrl = params.get("spotify");
+    const profileUrl = params.get("profile");
+    const input = document.getElementById("spotifyInput");
+
+    if (spotifyUrl) {
+        if(input) input.value = spotifyUrl;
+        renderCards(spotifyUrl);
+    } else if (profileUrl) {
+        if(input) input.value = profileUrl;
+        loadFriendPlaylists(profileUrl);
+    }
+});

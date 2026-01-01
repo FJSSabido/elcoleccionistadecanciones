@@ -6,6 +6,9 @@ import com.fjssabido.coleccionista_de_canciones.service.SpotifyCardService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/tracks")
 public class TrackController {
@@ -26,10 +29,14 @@ public class TrackController {
     public TrackCardDto getTrackCard(@PathVariable String id) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(appAuthService.getAppAccessToken());
-        return cardService.generateCardsFromUrl(
+
+        // Fixed: Extract "cards" from the Map and get the first (and only) TrackCardDto
+        Map<String, Object> response = cardService.generateCardsFromUrl(
                 "https://open.spotify.com/track/" + id,
                 headers
-        ).get(0);
+        );
+        @SuppressWarnings("unchecked")
+        List<TrackCardDto> cards = (List<TrackCardDto>) response.get("cards");
+        return cards.get(0);
     }
-
 }
