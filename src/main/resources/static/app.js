@@ -97,7 +97,6 @@ function renderPage(page) {
                     </div>
                 </div>
                 <div class="card-back">
-                    <p class="scan">www.elcoleccionistadecanciones.com</p>
                     <div class="qr"></div>
                 </div>
             </div>

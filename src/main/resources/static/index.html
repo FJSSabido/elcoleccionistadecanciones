@@ -25,8 +25,11 @@
     </script>
 </div>
 <header>
-    <h1><i class="fab fa-spotify"></i> El Coleccionista de Canciones 🎧</h1>
+    <div class="header-inner">
+        <h1><i class="fab fa-spotify"></i> El Coleccionista de Canciones 🎧</h1>
+    </div>
 </header>
+
 <div class="container">
     <section class="unified-section">
         <h2>¡Transforma tus playlists en cartas coleccionables!</h2>
@@ -37,7 +40,11 @@
         </div>
         <p id="unifiedStatus" class="status"></p>
     </section>
-    <h3 id="playlistTitle" class="playlist-title" style="display: none;"></h3>
+    <div id="playlistBar" class="playlist-bar">
+        <div class="playlist-inner">
+            <h3 id="playlistTitle" class="playlist-title"></h3>
+        </div>
+    </div>
     <div id="cards" class="cards-container"></div>
     <div id="pagination" style="display:none; text-align:center; margin-bottom:30px;">
         <button id="prevPageBtn" class="btn">⬅</button>

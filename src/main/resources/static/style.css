@@ -5,6 +5,58 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Arial, sans-serif;
 }
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+
+    text-align: center;
+    padding: 10px 0;
+    color: #1DB954;
+}
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+header h1 {
+    font-size: clamp(1.4rem, 4vw, 2.5rem);
+    line-height: 1.1;
+    margin: 0;
+
+    color: #1DB954;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+.playlist-bar {
+    position: sticky;
+    top: 56px;               /* ⬅ altura real del header */
+    z-index: 900;
+
+    width: 100%;
+    background-color: #f0f0f0;
+
+    border-bottom: 1px solid #ddd;
+}
+.playlist-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 6px 10px;
+
+    text-align: center;
+}
 
 body {
     background-color: #f0f0f0;
@@ -19,23 +71,7 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 30px;
     padding: 20px 10px;
-}
-
-header {
-    text-align: center;
-}
-
-h1 {
-    font-size: 2.5rem;
-    color: #1DB954;
-    margin-bottom: 5px;
-}
-
-h1 + p {
-    font-size: 1.2rem;
-    color: #555;
 }
 
 h2 {
@@ -144,6 +180,10 @@ h2 {
     display: flex;
     flex-direction: column;
 }
+.card-back .qr {
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
 /* Anverso: cover grande */
 .card-front {
@@ -210,12 +250,15 @@ h2 {
 /* Reverso: QR grande centrado */
 .card-back {
     transform: rotateY(180deg);
-    justify-content: center;
+
+    display: flex;
+    flex-direction: column;
+
     align-items: center;
+    justify-content: flex-start;   /* 🔥 contenido arriba */
+
     padding: 10px;
 }
-
-/* REEMPLAZA ESTO EN TU CSS */
 
 /* Contenedor blanco del QR */
 .qr {
@@ -237,6 +280,7 @@ h2 {
 
 /* El código generado (canvas o imagen) */
 .qr img, .qr canvas {
+
     width: 100% !important;   /* Fuerza a ocupar el espacio disponible */
     height: 100% !important;
     object-fit: contain;      /* Mantiene la proporción del dibujo */
@@ -244,11 +288,10 @@ h2 {
 }
 
 .scan {
-    margin-top: 15px;
-    font-size: 10px;          /* Texto un poco más pequeño en general */
+    margin: 0 0 10px 0;     /* espacio SOLO debajo */
+    font-size: 10px;
     opacity: 0.9;
     text-align: center;
-    padding: 0 5px;
 }
 
 /* Enlace */
@@ -261,19 +304,21 @@ a.card-link {
 }
 
 .playlist-title {
-    position: sticky;
-    top: 40px;
-    z-index: 10;
+    top: 75px;
+    z-index: 9;
+
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 4px 10px;
 
     text-align: center;
-    padding: 6px 0 6px;   /* 👈 CLAVE: casi sin aire */
 
     background-color: #f0f0f0;
     color: #1DB954;
     font-weight: 700;
-
-    border-bottom: none; /* 👈 elimina 1px fantasma */
+    line-height: 1.2;
 }
+
 
 
 
@@ -400,6 +445,14 @@ footer {
    CARTAS – TEXTO COMPACTO SOLO EN MÓVIL
    ===================================== */
 @media (max-width: 768px) {
+    .playlist-bar {
+        top: 25px; /* header más pequeño en móvil */
+    }
+
+    .playlist-inner {
+        padding: 4px 8px;
+    }
+
     /* 🔥 iframe completamente FUERA */
     .bmc-container {
         display: none !important;
@@ -458,17 +511,16 @@ footer {
         transform: scale(0.95);
     }
 
-    h1 { font-size: 2rem; }
     .btn { padding: 12px 20px; }
 
     .bmc-fab:active {
         transform: scale(0.95);
     }
     .playlist-title {
-        top: 40px;       /* 👈 altura real del header móvil */
-        padding: 6px 8px;         /* reduce altura */
-        font-size: 0.9rem;        /* más pequeño */
-        line-height: 1.2;         /* compacta el texto */
+        top: 48px;
+        padding: 2px 6px;
+        font-size: 0.9rem;
+        margin: 0;
 
         padding-top: 0;      /* 👈 clave */
         margin-top: 0;       /* 👈 asegura soldadura */
@@ -552,31 +604,17 @@ footer {
     }
     /* Ajuste fino para que el texto no moleste al QR en pantallas muy pequeñas */
     .scan {
+        position:top;
         font-size: 9px;
-        margin-top: 5px;
+        margin-top: 0px;
     }
 
     header {
-        padding: 4px 8px;          /* 👈 mínimo real */
-        padding-bottom: 0;   /* 👈 elimina el aire */
-        margin-bottom: 0;    /* 👈 por si acaso */
-
-        width: 100%;
-        margin-left: 0;
+        padding: 4px 8px;
     }
 
     header h1 {
-        font-size: 0.95rem;        /* 👈 mucho más compacto */
-        line-height: 1.1;
-        margin: 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;                  /* espacio justo icono-texto */
-        white-space: nowrap;       /* una sola línea */
-
-        margin-bottom: 0;    /* 👈 MUY importante */
+        font-size: 0.95rem;
     }
 
     header h1 i {
@@ -636,19 +674,6 @@ footer {
     color: #666;
     font-size: 0.9rem;
     font-weight: 500;
-}
-
-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000; /* 👈 más alto que playlist-title */
-
-    background-color: #f0f0f0; /* importante para que tape lo de debajo */
-
-    text-align: center;
-    padding: 10px 0;
-
-    border-bottom: 1px solid #ddd;
 }
 
 .playlist-main {
