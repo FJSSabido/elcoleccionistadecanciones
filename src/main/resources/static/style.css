@@ -555,14 +555,18 @@ footer {
 
     /* Cover */
     .cover-wrapper {
-        height: auto;
-        padding-top: 6px;
+        height: 68%;          /* 60mm de 88mm ≈ 68% */
+        padding: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .cover {
-        aspect-ratio: 1 / 1;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        max-height: 150px;
+        border-radius: 4mm;
     }
 
     /* Texto */
