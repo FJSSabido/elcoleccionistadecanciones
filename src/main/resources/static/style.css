@@ -365,17 +365,18 @@ a.card-link {
     to { transform: rotate(360deg); }
 }
 
-/* Centrar carta cuando solo hay una */
+/* Busca esta sección en tu style.css y reemplázala */
 #cards.single-card {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    display: flex !important; /* Cambiamos grid por flex para centrado total */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 400px; /* Evita que se pegue arriba */
 }
 
-/* Centrar carta cuando solo hay una */
-#cards.single-card a.card-link {
-    grid-column: 1 / -1;      /* ocupa tó el grid */
-    justify-self: center;     /* centra el link */
-    width: fit-content;              /* deja que ajuste al contenido */
+#cards.single-card .card-link {
+    width: 63mm; /* Mantiene el tamaño original de la carta */
+    margin: 0 auto;
 }
 
 /* =====================
@@ -468,17 +469,24 @@ footer {
     }
     /* 🔥 PRIORIDAD: carta única SIEMPRE centrada */
     #cards.single-card {
-        grid-template-columns: 1fr;
-        justify-items: center;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 400px;
+        padding: 20px 0;
     }
     #cards.single-card .card {
         width: 100%;
         max-width: 240px;
     }
-    #cards.single-card a.card-link {
-        grid-column: 1 / -1;
-        justify-self: center;
-        width: fit-content;
+    #cards.single-card .card-link {
+        /* Eliminamos el 'width: fit-content' que causa el colapso a 6px */
+        display: block;
+        width: 63mm;
+        height: 88mm;
+        margin: 0 auto;
+        flex-shrink: 0; /* Evita que se comprima */
     }
 
     /* Botón flotante real */
@@ -539,10 +547,10 @@ footer {
     }
     /* Carta */
     .card {
-        width: 100%;
-        height: auto;
-        max-width: 180px;
-        aspect-ratio: 63 / 88;
+        width: 63mm; /* Mantén el tamaño físico para que no dependa del % del padre */
+        height: 88mm;
+        max-width: 90vw; /* Pero que no se salga de la pantalla */
+        margin: 0 auto;
     }
 
     /* Cover */
