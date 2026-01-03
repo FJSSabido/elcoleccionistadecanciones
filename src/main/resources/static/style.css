@@ -135,16 +135,17 @@ h2 {
 #cards {
     display: grid;
     /* FIX: minmax a 160px para más cartas por fila sin solaparse */
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     /* FIX: gap a 20px para espacio moderado entre cartas */
-    gap: 20px;
+    gap: 12px;
     width: 100%;
     margin: 30px auto;
     /* FIX: padding a 20px para margen lateral */
-    padding: 0 20px;
-    justify-items: center;
+    padding: 0 8px;
+    justify-items: stretch;
     padding-bottom: 60px;
     margin-bottom: 5px;   /* 👈 ajusta a gusto: 40–80px */
+    max-width: 1800px;
 }
 
 /* Cartas: fondo negro, cover grande, texto estilizado */
@@ -404,15 +405,10 @@ footer {
     border-top: 1px solid #ddd;
 }
 
-.footer-link {
-    margin: 0;
-    line-height: 1;
-}
-
-
 .footer-text {
     margin: 0;
     line-height: 1;          /* 👈 clave */
+    font-size:1.5rem;
 }
 
 .footer-link {
