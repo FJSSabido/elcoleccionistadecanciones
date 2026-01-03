@@ -149,8 +149,12 @@ h2 {
 
 /* Cartas: fondo negro, cover grande, texto estilizado */
 .card {
-    width: 63mm;
-    height: 88mm;
+    width: 100%;          /* ocupa la columna del grid */
+    max-width: 74mm;      /* nunca más grande que la carta real */
+    aspect-ratio: 74 / 105;
+    height: auto;         /* deja que escale proporcionalmente */
+    margin: 0 auto;
+
     perspective: 1500px;
 }
 
@@ -191,7 +195,7 @@ h2 {
 }
 
 .cover-wrapper {
-    height: 60mm; /* Cover grande */
+    height: 65mm; /* Cover grande */
     padding: 3px;
     display: flex;
     justify-content: center;
@@ -375,7 +379,7 @@ a.card-link {
 }
 
 #cards.single-card .card-link {
-    width: 63mm; /* Mantiene el tamaño original de la carta */
+    width: 74mm; /* Mantiene el tamaño original de la carta */
     margin: 0 auto;
 }
 
@@ -466,6 +470,8 @@ footer {
 
         padding-left: 0;
         padding-right: 0;
+
+        overflow-x: hidden;
     }
     /* 🔥 PRIORIDAD: carta única SIEMPRE centrada */
     #cards.single-card {
@@ -483,8 +489,8 @@ footer {
     #cards.single-card .card-link {
         /* Eliminamos el 'width: fit-content' que causa el colapso a 6px */
         display: block;
-        width: 63mm;
-        height: 88mm;
+        width: 74mm;
+        height: 105mm;
         margin: 0 auto;
         flex-shrink: 0; /* Evita que se comprima */
     }
@@ -545,17 +551,19 @@ footer {
     #pagination {
      margin-bottom: 140px;  /* si hay paginación */
     }
-    /* Carta */
     .card {
-        width: 63mm; /* Mantén el tamaño físico para que no dependa del % del padre */
-        height: 88mm;
-        max-width: 90vw; /* Pero que no se salga de la pantalla */
+        width: 100%;
+        max-width: 74mm;
+        aspect-ratio: 74 / 105;
+        height: auto;
         margin: 0 auto;
+        perspective: 1500px;
     }
+
 
     /* Cover */
     .cover-wrapper {
-        height: 68%;          /* 60mm de 88mm ≈ 68% */
+        height: 70%;
         padding: 3px;
         display: flex;
         align-items: center;
