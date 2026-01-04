@@ -1,0 +1,21 @@
+{
+  "name": "El Coleccionista de Canciones",
+  "short_name": "Coleccionista",
+  "description": "Transforma playlists de Spotify en cartas coleccionables",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1DB954",
+  "theme_color": "#1DB954",
+  "icons": [
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
