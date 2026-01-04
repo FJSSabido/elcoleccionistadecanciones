@@ -46,7 +46,7 @@ public class ShareController {
         return "share";
     }
 
-    @GetMapping("/playlist/{id}")
+    @GetMapping("/share/playlist/{id}")
     public String sharePlaylist(@PathVariable String id, Model model) {
 
         PlaylistResponseDto playlist = cardService.getPlaylistById(id);
@@ -54,16 +54,12 @@ public class ShareController {
         model.addAttribute("title", playlist.getName() + " · El Coleccionista de Canciones");
         model.addAttribute("description", playlist.getTotalTracks() + " canciones");
         model.addAttribute("image", playlist.getImageUrl());
-        model.addAttribute("url", "https://tudominio.com/playlist/" + id);
+        model.addAttribute("url", "https://elcoleccionistadecanciones.com/share/playlist/" + id);
 
-        model.addAttribute(
-                "redirect",
-                "/?spotify=https://open.spotify.com/playlist/" + id
-        );
+        model.addAttribute("redirect", "/?playlist=" + id);
 
         return "share";
     }
-
 
     @GetMapping("/profile/{userId}")
     public String shareProfile(@PathVariable String userId, Model model) {

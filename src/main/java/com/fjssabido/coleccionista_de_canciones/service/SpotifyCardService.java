@@ -77,6 +77,7 @@ public class SpotifyCardService {
         return "ES"; // Default to ES for Spanish content; change to "US" if targeting another market
     }
 
+    // --- MÉTODO PÚBLICO USADO POR ShareController ---
     public PlaylistResponseDto getPlaylistById(String playlistId) {
 
         String spotifyUrl = "https://open.spotify.com/playlist/" + playlistId;
@@ -90,6 +91,7 @@ public class SpotifyCardService {
     }
 
 
+    // --- MAPPER DOMINIO ---
     @SuppressWarnings("unchecked")
     private PlaylistResponseDto mapToPlaylistResponse(
             Map<String, Object> rawResponse
@@ -98,11 +100,10 @@ public class SpotifyCardService {
         String name = (String) rawResponse.get("name");
         String description = (String) rawResponse.getOrDefault("description", "");
         String imageUrl = (String) rawResponse.get("imageUrl");
+        String owner = (String) rawResponse.getOrDefault("owner", "");
 
         Object totalObj = rawResponse.get("totalTracks");
         int totalTracks = totalObj instanceof Integer ? (Integer) totalObj : 0;
-
-        String owner = (String) rawResponse.getOrDefault("owner", "");
 
         return new PlaylistResponseDto(
                 name,
