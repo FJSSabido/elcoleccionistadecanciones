@@ -1,6 +1,7 @@
 // Modified: SpotifyCardService.java
 package com.fjssabido.coleccionista_de_canciones.service;
 
+import com.fjssabido.coleccionista_de_canciones.dto.PlaylistResponseDto;
 import com.fjssabido.coleccionista_de_canciones.dto.TrackCardDto;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,10 +16,14 @@ import java.util.Map;
 @Service
 public class SpotifyCardService {
 
+
+
+    private final SpotifyAuthService authService;
     private final SpotifyTrackService trackService;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public SpotifyCardService(SpotifyTrackService trackService) {
+    public SpotifyCardService(SpotifyTrackService trackService, SpotifyAuthService authService) {
+        this.authService = authService;
         this.trackService = trackService;
     }
 
@@ -71,4 +76,43 @@ public class SpotifyCardService {
         }
         return "ES"; // Default to ES for Spanish content; change to "US" if targeting another market
     }
+
+    public PlaylistResponseDto getPlaylistById(String playlistId) {
+
+        String spotifyUrl = "https://open.spotify.com/playlist/" + playlistId;
+
+        HttpHeaders headers = authService.getAuthHeaders();
+
+        Map<String, Object> rawResponse =
+                generateCardsFromUrl(spotifyUrl, headers);
+
+        return mapToPlaylistResponse(rawResponse);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private PlaylistResponseDto mapToPlaylistResponse(
+            Map<String, Object> rawResponse
+    ) {
+
+        String name = (String) rawResponse.get("name");
+        String description = (String) rawResponse.getOrDefault("description", "");
+        String imageUrl = (String) rawResponse.get("imageUrl");
+
+        Object totalObj = rawResponse.get("totalTracks");
+        int totalTracks = totalObj instanceof Integer ? (Integer) totalObj : 0;
+
+        String owner = (String) rawResponse.getOrDefault("owner", "");
+
+        return new PlaylistResponseDto(
+                name,
+                description,
+                totalTracks,
+                owner,
+                imageUrl
+        );
+    }
+
+
+
 }

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}">El Coleccionista de Canciones</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" th:content="${title}">
+    <meta property="og:description" th:content="${description}">
+    <meta property="og:image" th:content="${image}">
+    <meta property="og:url" th:content="${url}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter / WhatsApp -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Redirección al frontend -->
+    <meta http-equiv="refresh" th:content="'0; url=' + ${redirect}">
+</head>
+<body></body>
+</html>

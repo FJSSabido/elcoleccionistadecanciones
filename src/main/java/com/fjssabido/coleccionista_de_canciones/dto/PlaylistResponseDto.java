@@ -59,4 +59,32 @@ public class PlaylistResponseDto {
     public String getImageUrl() {
         return imageUrl;
     }
+
+    public void setCards(List<TrackCardDto> cards) {
+        this.cards = cards;
+    }
+
+    public void setDiscarded(int discarded) {
+        this.discarded = discarded;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTotalTracks(int totalTracks) {
+        this.totalTracks = totalTracks;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
